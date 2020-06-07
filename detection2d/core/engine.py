@@ -5,6 +5,16 @@ from detection2d.utils import utils
 
 
 def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq):
+    """
+    train one epoch
+    :param model:
+    :param optimizer:
+    :param data_loader:
+    :param device:
+    :param epoch:
+    :param print_freq:
+    :return:
+    """
     model.train()
     metric_logger = utils.MetricLogger(delimiter="  ")
     metric_logger.add_meter('lr', utils.SmoothedValue(window_size=1, fmt='{value:.6f}'))
