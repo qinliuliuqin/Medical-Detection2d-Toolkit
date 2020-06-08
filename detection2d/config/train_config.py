@@ -1,5 +1,4 @@
 from easydict import EasyDict as edict
-from detection3d.utils.normalizer import FixedNormalizer, AdaptiveNormalizer
 
 __C = edict()
 cfg = __C
@@ -43,12 +42,6 @@ __C.dataset.negative_lower_bound = 6    # voxel
 __C.dataset.num_pos_patches_per_image = 8
 
 __C.dataset.num_neg_patches_per_image = 16
-
-# crop intensity normalizers (to [-1,1])
-# one normalizer corresponds to one input modality
-# 1) FixedNormalizer: use fixed mean and standard deviation to normalize intensity
-# 2) AdaptiveNormalizer: use minimum and maximum intensity of crop to normalize intensity
-__C.dataset.crop_normalizers = [AdaptiveNormalizer()]
 
 # sampling method:
 # 1) GLOBAL: sampling crops randomly in the entire image domain
