@@ -9,19 +9,19 @@ cfg = __C
 ##################################
 __C.general = {}
 
-__C.general.train_label_file = '/mnt/projects/CXR_Object/train.csv'
+__C.general.train_label_file = '/shenlab/lab_stor6/projects/CXR_Object/train.csv'
 
-__C.general.train_image_folder = '/mnt/projects/CXR_Object/train'
+__C.general.train_image_folder = '/shenlab/lab_stor6/projects/CXR_Object/train'
 
-__C.general.val_label_file = '/mnt/projects/CXR_Object/dev.csv'
+__C.general.val_label_file = '/shenlab/lab_stor6/projects/CXR_Object/dev.csv'
 
-__C.general.val_image_folder = '/mnt/projects/CXR_Object/dev'
+__C.general.val_image_folder = '/shenlab/lab_stor6/projects/CXR_Object/dev'
 
-__C.general.save_dir = '/mnt/projects/CXR_Object/models/model_0607_2020'
+__C.general.save_dir = '/shenlab/lab_stor6/qinliu/CXR_Object/model_0608_2020/contrast_adam'
 
 __C.general.resume_epoch = -1
 
-__C.general.num_gpus = 0
+__C.general.num_gpus = 1
 
 ##################################
 # dataset parameters
@@ -95,11 +95,11 @@ __C.net.name = 'faster_rcnn'
 ##################################
 __C.train = {}
 
-__C.train.epochs = 2001
+__C.train.epochs = 101
 
-__C.train.batch_size = 1
+__C.train.batch_size = 12
 
-__C.train.num_threads = 1
+__C.train.num_threads = 12
 
 __C.train.lr = 0.005
 
