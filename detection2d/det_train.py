@@ -110,7 +110,7 @@ def train(config_file, gpu_id):
 
     for epoch in range(cfg.train.save_epochs):
 
-        train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=1)
+        train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=cfg.train.print_freq)
 
         lr_scheduler.step()
 

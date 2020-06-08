@@ -105,6 +105,8 @@ __C.train.lr = 0.005
 
 __C.train.save_epochs = 100
 
+__C.train.print_freq = 20
+
 ##################################
 # optimizer parameters
 ##################################
