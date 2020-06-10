@@ -1,5 +1,4 @@
 from easydict import EasyDict as edict
-from detection3d.utils.normalizer import FixedNormalizer, AdaptiveNormalizer
 
 __C = edict()
 cfg = __C
@@ -17,7 +16,7 @@ __C.general.val_label_file = '/shenlab/lab_stor6/projects/CXR_Object/dev.csv'
 
 __C.general.val_image_folder = '/shenlab/lab_stor6/projects/CXR_Object/dev'
 
-__C.general.save_dir = '/shenlab/lab_stor6/qinliu/CXR_Object/model_0608_2020/contrast_adam'
+__C.general.save_dir = '/mnt/projects/CXR_Object/models/model_0610_2020'
 
 __C.general.resume_epoch = -1
 
@@ -43,12 +42,6 @@ __C.dataset.negative_lower_bound = 6    # voxel
 __C.dataset.num_pos_patches_per_image = 8
 
 __C.dataset.num_neg_patches_per_image = 16
-
-# crop intensity normalizers (to [-1,1])
-# one normalizer corresponds to one input modality
-# 1) FixedNormalizer: use fixed mean and standard deviation to normalize intensity
-# 2) AdaptiveNormalizer: use minimum and maximum intensity of crop to normalize intensity
-__C.dataset.crop_normalizers = [AdaptiveNormalizer()]
 
 # sampling method:
 # 1) GLOBAL: sampling crops randomly in the entire image domain
@@ -90,6 +83,8 @@ __C.net = {}
 
 __C.net.name = 'faster_rcnn'
 
+__C.net.pre_trained = True
+
 ##################################
 # training parameters
 ##################################
@@ -113,7 +108,7 @@ __C.train.print_freq = 20
 
 __C.train.optimizer = {}
 
-__C.train.optimizer.name = 'Adam' # 'SGD' or 'Adam'
+__C.train.optimizer.name = 'SGD' # 'SGD' or 'Adam'
 
 __C.train.optimizer.sgd_momentum = 0.9
 
