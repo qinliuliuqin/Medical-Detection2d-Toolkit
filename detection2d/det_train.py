@@ -81,7 +81,7 @@ def train(config_file, gpu_id):
     )
 
     model_module = importlib.import_module('detection2d.network.' + cfg.net.name)
-    model = model_module.get_detection_model(cfg.dataset.num_classes, True)
+    model = model_module.get_detection_model(cfg.dataset.num_classes, cfg.net.pre_trained)
 
     if cfg.general.num_gpus > 0:
         torch.cuda.set_device(gpu_id)

@@ -16,7 +16,7 @@ __C.general.val_label_file = '/mnt/projects/CXR_Object/dev.csv'
 
 __C.general.val_image_folder = '/mnt/projects/CXR_Object/dev'
 
-__C.general.save_dir = '/mnt/projects/CXR_Object/models/model_0607_2020'
+__C.general.save_dir = '/mnt/projects/CXR_Object/models/model_0610_2020'
 
 __C.general.resume_epoch = -1
 
@@ -83,6 +83,8 @@ __C.net = {}
 
 __C.net.name = 'faster_rcnn'
 
+__C.net.pre_trained = True
+
 ##################################
 # training parameters
 ##################################
@@ -106,7 +108,7 @@ __C.train.print_freq = 20
 
 __C.train.optimizer = {}
 
-__C.train.optimizer.name = 'Adam' # 'SGD' or 'Adam'
+__C.train.optimizer.name = 'SGD' # 'SGD' or 'Adam'
 
 __C.train.optimizer.sgd_momentum = 0.9
 
