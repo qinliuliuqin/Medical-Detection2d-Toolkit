@@ -152,7 +152,7 @@ def train(config_file, gpu_id):
 
 def main():
 
-    long_description = "Training engine for 3d medical image landmark detection"
+    long_description = "Training engine for 2d medical image object detection"
     parser = argparse.ArgumentParser(description=long_description)
 
     parser.add_argument('-i', '--input',
