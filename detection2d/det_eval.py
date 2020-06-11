@@ -3,24 +3,17 @@ from collections import namedtuple
 import numpy as np
 from skimage.measure import points_in_poly
 
-
-Object = namedtuple('Object',
-                    ['image_path', 'object_id', 'object_type', 'coordinates'])
-Prediction = namedtuple('Prediction',
-                        ['image_path', 'probability', 'coordinates'])
-
-
-parser = argparse.ArgumentParser(description='Compute FROC')
-parser.add_argument('gt_csv', default=None, metavar='GT_CSV',
-                    type=str, help="Path to the ground truch csv file")
-parser.add_argument('pred_csv', default=None, metavar='PRED_PATH',
-                    type=str, help="Path to the predicted csv file")
-parser.add_argument('--fps', default='0.125,0.25,0.5,1,2,4,8', type=str,
-                    help='False positives per image to compute FROC, comma '
-                    'seperated, default "0.125,0.25,0.5,1,2,4,8"')
+Object = namedtuple('Object', ['image_path', 'object_id', 'object_type', 'coordinates'])
+Prediction = namedtuple('Prediction', ['image_path', 'probability', 'coordinates'])
 
 
 def inside_object(pred, obj):
+    """
+    Test whether the predicted bounding box is inside the ground truth bounding box.
+    :param pred:
+    :param obj:
+    :return: bool
+    """
     # bounding box
     if obj.object_type == '0':
         x1, y1, x2, y2 = obj.coordinates
@@ -40,14 +33,19 @@ def inside_object(pred, obj):
         return points_in_poly(pred.coordinates.reshape(1, 2), poly_points)[0]
 
 
-def main():
-    args = parser.parse_args()
-
+def evaluate(gt_csv_path, pred_csv_path, fps):
+    """
+    Evaluate the localization error
+    :param gt_csv_path:
+    :param pred_csv_path:
+    :param fps:
+    :return:
+    """
     # parse ground truth csv
     num_image = 0
     num_object = 0
     object_dict = {}
-    with open(args.gt_csv) as f:
+    with open(gt_csv_path) as f:
         # header
         next(f)
         for line in f:
@@ -72,7 +70,7 @@ def main():
 
     # parse prediction truth csv
     preds = []
-    with open(args.pred_csv) as f:
+    with open(pred_csv_path) as f:
         # header
         next(f)
         for line in f:
@@ -96,7 +94,7 @@ def main():
     false_positives = 0
     fps_idx = 0
     object_hitted = set()
-    fps = list(map(float, args.fps.split(',')))
+    fps = list(map(float, fps.split(',')))
     froc = []
     for i in range(len(preds)):
         is_inside = False
@@ -125,12 +123,34 @@ def main():
 
     # print froc
     print('False positives per image:')
-    print('\t'.join(args.fps.split(',')))
+    print('\t'.join(fps.split(',')))
     print('Sensitivity:')
     print('\t'.join(map(lambda x: '{:.3f}'.format(x), froc)))
     print('FROC:')
     print(np.mean(froc))
 
 
+
+def main():
+
+    parser = argparse.ArgumentParser(description='Compute FROC')
+    parser.add_argument('-g', '--gt-csv',
+                        default='/shenlab/lab_stor6/projects/CXR_Object/dev.csv',
+                        metavar='GT_CSV',
+                        help="Path to the ground truch csv file")
+    parser.add_argument('-p', '--pred-csv',
+                        default='/shenlab/lab_stor6/qinliu/CXR_Object/results/model_0610_2020/localization.csv',
+                        metavar='PRED_PATH',
+                        help="Path to the predicted csv file")
+    parser.add_argument('-f', '--fps',
+                        default='0.125,0.25,0.5,1,2,4,8',
+                        help='False positives per image to compute FROC, comma seperated')
+
+    args = parser.parse_args()
+
+    evaluate(args.gt_csv, args.pred_csv, args.fps)
+
+
 if __name__ == '__main__':
+
     main()
