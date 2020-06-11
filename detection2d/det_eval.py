@@ -123,7 +123,7 @@ def evaluate(gt_csv_path, pred_csv_path, fps):
 
     # print froc
     print('False positives per image:')
-    print('\t'.join(fps.split(',')))
+    print(fps)
     print('Sensitivity:')
     print('\t'.join(map(lambda x: '{:.3f}'.format(x), froc)))
     print('FROC:')
