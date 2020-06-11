@@ -102,6 +102,9 @@ def infer(model_path, data_folder, infer_file, num_classes, save_folder, cuda_id
                         center_points[i][1]) + ';'
             locs.append(line)
 
+    if not os.path.isdir(save_folder):
+        os.makedirs(save_folder)
+
     cls_res = pd.DataFrame({'image_name': dataset.image_files_list, 'prediction': preds})
     cls_res.to_csv(
         os.path.join(save_folder, 'classification.csv'), columns=['image_name', 'prediction'], sep=',', index=None
