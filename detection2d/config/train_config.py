@@ -1,4 +1,6 @@
 from easydict import EasyDict as edict
+import torchvision.transforms as transforms
+
 
 __C = edict()
 cfg = __C
@@ -29,20 +31,6 @@ __C.dataset = {}
 
 __C.dataset.num_classes = 2
 
-__C.dataset.crop_spacing = [2, 2, 2]      # mm
-
-__C.dataset.crop_size = [96, 96, 96]   # voxel
-
-__C.dataset.sampling_size = [6, 6, 6]      # voxel
-
-__C.dataset.positive_upper_bound = 3    # voxel
-
-__C.dataset.negative_lower_bound = 6    # voxel
-
-__C.dataset.num_pos_patches_per_image = 8
-
-__C.dataset.num_neg_patches_per_image = 16
-
 # sampling method:
 # 1) GLOBAL: sampling crops randomly in the entire image domain
 __C.dataset.sampling_method = 'GLOBAL'
@@ -55,15 +43,11 @@ __C.dataset.interpolation = 'LINEAR'
 ##################################
 # data augmentation parameters
 ##################################
-__C.augmentation = {}
-
-__C.augmentation.turn_on = False
-
-__C.augmentation.orientation_axis = [0, 0, 0]  # [x,y,z], axis = [0,0,0] will set it as random axis.
-
-__C.augmentation.orientation_radian = [-30, 30]  # range of rotation in degree, 1 degree = 0.0175 radian
-
-__C.augmentation.translation = [10, 10, 10]  # mm
+__C.data_transforms = transforms.Compose([
+    transforms.Resize((600, 600)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
 
 ##################################
 # loss function

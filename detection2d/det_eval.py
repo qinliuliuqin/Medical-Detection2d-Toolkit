@@ -86,7 +86,7 @@ def evaluate(gt_csv_path, pred_csv_path, fps):
                 pred = Prediction(image_path, probability, np.array([x, y]))
                 preds.append(pred)
 
-    # sort prediction by probabiliyt
+    # sort prediction by probability
     preds = sorted(preds, key=lambda x: x.probability, reverse=True)
 
     # compute hits and false positives

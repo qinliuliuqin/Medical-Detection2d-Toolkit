@@ -6,7 +6,6 @@ import pandas as pd
 import shutil
 from sklearn.metrics import roc_auc_score
 import torch
-import torchvision.transforms as transforms
 
 from detection2d.dataset.foreigen_object_dataset import ForeignObjectDataset
 from detection2d.core.engine import train_one_epoch
@@ -58,15 +57,9 @@ def train(config_file, gpu_id):
     img_class_dict_tr = dict(zip(labels_tr.image_name, labels_tr.annotation))
     img_class_dict_dev = dict(zip(labels_dev.image_name, labels_dev.annotation))
 
-    data_transforms = transforms.Compose([
-        transforms.Resize((600,600)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        ])
-
     # load training dataset
     dataset_train = ForeignObjectDataset(
-        datafolder= data_folder_tr, datatype='train', transform=data_transforms, labels_dict=img_class_dict_tr
+        datafolder= data_folder_tr, datatype='train', transform=cfg.data_transforms, labels_dict=img_class_dict_tr
     )
     data_loader = torch.utils.data.DataLoader(
         dataset_train, batch_size=cfg.train.batch_size, shuffle= True, num_workers=cfg.train.batch_size, collate_fn=utils.collate_fn
@@ -74,7 +67,7 @@ def train(config_file, gpu_id):
 
     # load validation dataset
     dataset_dev = ForeignObjectDataset(
-        datafolder= data_folder_dev, datatype='dev', transform=data_transforms, labels_dict=img_class_dict_dev
+        datafolder= data_folder_dev, datatype='dev', transform=cfg.data_transforms, labels_dict=img_class_dict_dev
     )
     data_loader_val = torch.utils.data.DataLoader(
         dataset_dev, batch_size=1, shuffle= False, num_workers=1, collate_fn=utils.collate_fn
