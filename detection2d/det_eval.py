@@ -144,7 +144,7 @@ def main():
                         help="Path to the predicted csv file")
     parser.add_argument('-f', '--fps',
                         default='0.125,0.25,0.5,1,2,4,8',
-                        help='False positives per image to compute FROC, comma seperated')
+                        help='False positives per image to compute FROC, comma separated')
 
     args = parser.parse_args()
 
