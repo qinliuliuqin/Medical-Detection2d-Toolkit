@@ -11,6 +11,9 @@ from detection2d.dataset.foreigen_object_dataset import ForeignObjectDataset
 from detection2d.network.faster_rcnn import get_detection_model
 
 
+WIDTH = 600
+HEIGHT = 600
+
 def get_device(cuda_id):
     """
     Get device for inference
@@ -45,7 +48,7 @@ def infer(model_path, data_folder, infer_file, num_classes, save_folder, cuda_id
     model.eval()
 
     data_transforms = transforms.Compose([
-        transforms.Resize((600, 600)),
+        transforms.Resize((WIDTH, HEIGHT)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
@@ -57,10 +60,18 @@ def infer(model_path, data_folder, infer_file, num_classes, save_folder, cuda_id
 
     # load test dataset
     dataset = ForeignObjectDataset(
-        datafolder=data_folder, datatype='dev', transform=data_transforms, labels_dict=labels_dict
+        data_folder=data_folder,
+        data_type='dev',
+        transform=data_transforms,
+        labels_dict=labels_dict,
+        resize_size=[WIDTH, HEIGHT]
     )
     data_loader = torch.utils.data.DataLoader(
-        dataset, batch_size=1, shuffle= False, num_workers=1, collate_fn=collate_fn
+        dataset,
+        batch_size=1,
+        shuffle=False,
+        num_workers=1,
+        collate_fn=collate_fn
     )
 
     for image, label, width, height in tqdm(data_loader):
@@ -89,7 +100,7 @@ def infer(model_path, data_folder, infer_file, num_classes, save_folder, cuda_id
                 new_box = new_boxes[i].tolist()
                 center_x = (new_box[0] + new_box[2]) / 2
                 center_y = (new_box[1] + new_box[3]) / 2
-                center_points.append([center_x / 600 * width[-1], center_y / 600 * height[-1]])
+                center_points.append([center_x / WIDTH * width[-1], center_y / HEIGHT * height[-1]])
             center_points_preds += new_scores.tolist()
 
             line = ''

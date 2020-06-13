@@ -5,6 +5,9 @@ import torchvision.transforms as transforms
 __C = edict()
 cfg = __C
 
+WIDTH = 600
+HEIGHT = 600
+
 ##################################
 # general parameters
 ##################################
@@ -31,34 +34,16 @@ __C.dataset = {}
 
 __C.dataset.num_classes = 2
 
-# sampling method:
-# 1) GLOBAL: sampling crops randomly in the entire image domain
-__C.dataset.sampling_method = 'GLOBAL'
-
-# linear interpolation method:
-# 1) NN: nearest neighbor interpolation
-# 2) LINEAR: linear interpolation
-__C.dataset.interpolation = 'LINEAR'
+__C.dataset.resize_size = [WIDTH, HEIGHT]
 
 ##################################
 # data augmentation parameters
 ##################################
 __C.data_transforms = transforms.Compose([
-    transforms.Resize((600, 600)),
+    transforms.Resize((WIDTH, HEIGHT)),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
-
-##################################
-# loss function
-##################################
-__C.landmark_loss = {}
-
-__C.landmark_loss.name = 'Focal'          # 'Dice', or 'Focal'
-
-__C.landmark_loss.focal_obj_alpha = [0.75] * 24  # class balancing weight for focal loss
-
-__C.landmark_loss.focal_gamma = 2         # gamma in pow(1-p,gamma) for focal loss
 
 ##################################
 # net

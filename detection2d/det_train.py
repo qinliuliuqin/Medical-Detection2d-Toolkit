@@ -59,18 +59,34 @@ def train(config_file, gpu_id):
 
     # load training dataset
     dataset_train = ForeignObjectDataset(
-        datafolder= data_folder_tr, datatype='train', transform=cfg.data_transforms, labels_dict=img_class_dict_tr
+        data_folder=data_folder_tr,
+        data_type='train',
+        transform=cfg.data_transforms,
+        labels_dict=img_class_dict_tr,
+        resize_size=cfg.dataset.resize_size
     )
     data_loader = torch.utils.data.DataLoader(
-        dataset_train, batch_size=cfg.train.batch_size, shuffle= True, num_workers=cfg.train.batch_size, collate_fn=utils.collate_fn
+        dataset_train,
+        batch_size=cfg.train.batch_size,
+        shuffle= True,
+        num_workers=cfg.train.batch_size,
+        collate_fn=utils.collate_fn
     )
 
     # load validation dataset
     dataset_dev = ForeignObjectDataset(
-        datafolder= data_folder_dev, datatype='dev', transform=cfg.data_transforms, labels_dict=img_class_dict_dev
+        data_folder=data_folder_dev,
+        data_type='dev',
+        transform=cfg.data_transforms,
+        labels_dict=img_class_dict_dev,
+        resize_size=cfg.dataset.resize_size
     )
     data_loader_val = torch.utils.data.DataLoader(
-        dataset_dev, batch_size=1, shuffle= False, num_workers=1, collate_fn=utils.collate_fn
+        dataset_dev,
+        batch_size=1,
+        shuffle=False,
+        num_workers=1,
+        collate_fn=utils.collate_fn
     )
 
     model_module = importlib.import_module('detection2d.network.' + cfg.net.name)

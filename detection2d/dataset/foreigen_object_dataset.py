@@ -5,26 +5,26 @@ import torch
 
 class ForeignObjectDataset(object):
 
-    def __init__(self, datafolder, datatype='train', transform=True, labels_dict={}):
-        self.datafolder = datafolder
-        self.datatype = datatype
+    def __init__(self, data_folder, data_type, labels_dict, resize_size, transform=None):
+        self.data_folder = data_folder
+        self.data_type = data_type
         self.labels_dict = labels_dict
-        self.image_files_list = [s for s in sorted(os.listdir(datafolder)) if s in labels_dict.keys()]
+        self.resize_size = resize_size
+        self.image_files_list = [s for s in sorted(os.listdir(data_folder)) if s in labels_dict.keys()]
         self.transform = transform
         self.annotations = [labels_dict[i] for i in self.image_files_list]
 
     def __getitem__(self, idx):
         # load images
         img_name = self.image_files_list[idx]
-        img_path = os.path.join(self.datafolder, img_name)
+        img_path = os.path.join(self.data_folder, img_name)
         img = Image.open(img_path).convert("RGB")
         width, height = img.size[0], img.size[1]
 
-        if self.datatype == 'train':
+        if self.data_type == 'train':
             annotation = self.labels_dict[img_name]
 
             boxes = []
-
             if type(annotation) == str:
                 annotation_list = annotation.split(';')
                 for anno in annotation_list:
@@ -39,10 +39,10 @@ class ForeignObjectDataset(object):
                         else:
                             y.append(float(anno[i]))
 
-                    xmin = min(x) / width * 600
-                    xmax = max(x) / width * 600
-                    ymin = min(y) / height * 600
-                    ymax = max(y) / height * 600
+                    xmin = min(x) / width * self.resize_size[0]
+                    xmax = max(x) / width * self.resize_size[0]
+                    ymin = min(y) / height * self.resize_size[1]
+                    ymax = max(y) / height * self.resize_size[1]
                     boxes.append([xmin, ymin, xmax, ymax])
 
             # convert everything into a torch.Tensor
@@ -67,17 +67,17 @@ class ForeignObjectDataset(object):
 
             return img, target
 
-        if self.datatype == 'dev':
+        elif self.data_type == 'dev':
 
-            if self.labels_dict[img_name] == '':
-                label = 0
-            else:
-                label = 1
+            label = 0 if self.labels_dict[img_name] == '' else 1
 
             if self.transform is not None:
                 img = self.transform(img)
 
             return img, label, width, height
+
+        else:
+            raise ValueError('Unsupported dataset type!')
 
     def __len__(self):
         return len(self.image_files_list)
