@@ -10,23 +10,24 @@ data_dir = '/mnt/projects/CXR_Object/'
 OBJECT_SEP = ';'
 ANNOTATION_SEP = ' '
 
+save_fig_folder = '/mnt/projects/CXR_Object/vis'
+if not os.path.isdir(save_fig_folder):
+    os.makedirs(save_fig_folder)
 
 train_csv = os.path.join(data_dir, 'train.csv')
 labels_tr = pd.read_csv(train_csv, na_filter=False)
 
 # viz
-fig, axs = plt.subplots(
-    nrows=1, ncols=4, subplot_kw=dict(xticks=[], yticks=[]), figsize=(24, 6)
-)
+for idx in range(len(labels_tr)):
+    print(idx)
+    image_name = labels_tr.iloc[idx]['image_name']
+    annotation = labels_tr.iloc[idx]['annotation']
 
-example_idxes = [58, 1850, 2611, 6213]
-for row, ax in zip(
-        labels_tr.iloc[example_idxes].itertuples(index=False), axs
-):
-    im_path = data_dir + "train/" + row.image_name
-    im = Image.open(im_path).convert("RGB")
-    if row.annotation:
-        draw_annotation(im, row.annotation)
+    image_path = os.path.join(data_dir, "train", image_name)
+    image = Image.open(image_path).convert("RGB")
+    if annotation:
+        draw_annotation(image, annotation)
 
-    ax.imshow(im)
-    ax.set_title(f"{row.image_name}")
+    plt.imshow(image)
+    plt.title('{}'.format(image_name))
+    plt.savefig(os.path.join(save_fig_folder, image_name))
