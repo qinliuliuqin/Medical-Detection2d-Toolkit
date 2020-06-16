@@ -144,18 +144,17 @@ def train(config_file, gpu_id):
                 val_pred_label.append(0)
 
         number = 0
-
         for i in range(len(val_pred_label)):
             if val_pred_label[i] == val_label[i]:
                 number += 1
         acc = number / len(val_pred_label)
-
         auc = roc_auc_score(val_label, val_pred)
-        print('Epoch: ', epoch, '| val acc: %.4f' % acc, '| val auc: %.4f' % auc)
+
+        logger.info('Epoch: ', epoch, '| val acc: %.4f' % acc, '| val auc: %.4f' % auc)
 
         if auc > auc_max:
             auc_max = auc
-            print('Best Epoch: ', epoch, '| val acc: %.4f' % acc, '| Best val auc: %.4f' % auc_max)
+            logger.info('Best Epoch: ', epoch, '| val acc: %.4f' % acc, '| Best val auc: %.4f' % auc_max)
             torch.save(model.state_dict(), os.path.join(cfg.general.save_dir, 'model.pt'))
 
 
