@@ -44,7 +44,7 @@ def infer(model_path, data_folder, infer_file, num_classes, save_folder, cuda_id
     device = get_device(cuda_id)
     model = get_detection_model(num_classes, False)
     model.to(device)
-    model.load_state_dict(torch.load(model_path))
+    model.load_state_dict(torch.load(model_path, map_location=device))
     model.eval()
 
     data_transforms = transforms.Compose([
@@ -144,6 +144,7 @@ def main():
 
     parser.add_argument('-m', '--model',
                         default='/shenlab/lab_stor6/qinliu/CXR_Object/models/model_0610_2020/model.pt',
+                        #default='/shenlab/lab_stor6/qinliu/CXR_Object/models/model_0617_2020/adam_contrast/model.pt',
                         help='Model path.')
     parser.add_argument('-d', '--data-folder',
                         default='/shenlab/lab_stor6/projects/CXR_Object/dev',
@@ -155,10 +156,10 @@ def main():
                         default=2,
                         help='')
     parser.add_argument('-o', '--output',
-                        default='/shenlab/lab_stor6/qinliu/CXR_Object/results/model_0610_2020',
+                        default='/shenlab/lab_stor6/qinliu/CXR_Object/results/model_0617_2020',
                         help='')
     parser.add_argument('-g', '--gpu',
-                        default=0,
+                        default=6,
                         help='')
     args = parser.parse_args()
 
