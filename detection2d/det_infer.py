@@ -74,44 +74,45 @@ def infer(model_path, data_folder, infer_file, num_classes, save_folder, cuda_id
         collate_fn=collate_fn
     )
 
-    for image, label, width, height in tqdm(data_loader):
+    with torch.no_grad():
+        for image, label, width, height in tqdm(data_loader):
 
-        image = list(img.to(device) for img in image)
-        labels.append(label[-1])
+            image = list(img.to(device) for img in image)
+            labels.append(label[-1])
 
-        outputs = model(image)
+            outputs = model(image)
 
-        center_points = []
-        center_points_preds = []
+            center_points = []
+            center_points_preds = []
 
-        if len(outputs[-1]['boxes']) == 0:
-            preds.append(0)
-            center_points.append([])
-            center_points_preds.append('')
-            locs.append('')
-        else:
-            preds.append(torch.max(outputs[-1]['scores']).tolist())
+            if len(outputs[-1]['boxes']) == 0:
+                preds.append(0)
+                center_points.append([])
+                center_points_preds.append('')
+                locs.append('')
+            else:
+                preds.append(torch.max(outputs[-1]['scores']).tolist())
 
-            new_output_index = torch.where((outputs[-1]['scores'] > 0.1))
-            new_boxes = outputs[-1]['boxes'][new_output_index]
-            new_scores = outputs[-1]['scores'][new_output_index]
+                new_output_index = torch.where((outputs[-1]['scores'] > 0.1))
+                new_boxes = outputs[-1]['boxes'][new_output_index]
+                new_scores = outputs[-1]['scores'][new_output_index]
 
-            for i in range(len(new_boxes)):
-                new_box = new_boxes[i].tolist()
-                center_x = (new_box[0] + new_box[2]) / 2
-                center_y = (new_box[1] + new_box[3]) / 2
-                center_points.append([center_x / WIDTH * width[-1], center_y / HEIGHT * height[-1]])
-            center_points_preds += new_scores.tolist()
+                for i in range(len(new_boxes)):
+                    new_box = new_boxes[i].tolist()
+                    center_x = (new_box[0] + new_box[2]) / 2
+                    center_y = (new_box[1] + new_box[3]) / 2
+                    center_points.append([center_x / WIDTH * width[-1], center_y / HEIGHT * height[-1]])
+                center_points_preds += new_scores.tolist()
 
-            line = ''
-            for i in range(len(new_boxes)):
-                if i == len(new_boxes) - 1:
-                    line += str(center_points_preds[i]) + ' ' + str(center_points[i][0]) + ' ' + str(
-                        center_points[i][1])
-                else:
-                    line += str(center_points_preds[i]) + ' ' + str(center_points[i][0]) + ' ' + str(
-                        center_points[i][1]) + ';'
-            locs.append(line)
+                line = ''
+                for i in range(len(new_boxes)):
+                    if i == len(new_boxes) - 1:
+                        line += str(center_points_preds[i]) + ' ' + str(center_points[i][0]) + ' ' + str(
+                            center_points[i][1])
+                    else:
+                        line += str(center_points_preds[i]) + ' ' + str(center_points[i][0]) + ' ' + str(
+                            center_points[i][1]) + ';'
+                locs.append(line)
 
     if not os.path.isdir(save_folder):
         os.makedirs(save_folder)
