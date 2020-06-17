@@ -79,15 +79,21 @@ __C.train.optimizer = {}
 
 __C.train.optimizer.name = 'SGD' # 'SGD' or 'Adam'
 
-__C.train.optimizer.sgd_momentum = 0.9
+__C.train.optimizer.momentum = 0.9  # used for SGD
 
-__C.train.optimizer.adam_betas = (0.9, 0.999)
+__C.train.optimizer.betas = (0.9, 0.999)  # used for Adam
 
 __C.train.optimizer.weight_decay = 0.0005
 
-__C.train.optimizer.step_size = 5
+##################################
+# scheduler parameters
+##################################
 
-__C.train.optimizer.gamma = 0.1
+__C.train.scheduler = {}
+
+__C.train.scheduler.step_size = 5
+
+__C.train.scheduler.gamma = 0.1
 
 ##################################
 # debug parameters

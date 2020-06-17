@@ -101,23 +101,22 @@ def train(config_file, gpu_id):
     model.to(device)
 
     params = [p for p in model.parameters() if p.requires_grad]
-    optim = cfg.train.optimizer
-    if optim.name == 'SGD':
+    optmr, schdr = cfg.train.optimizer, cfg.train.scheduler
+    if optmr.name == 'SGD':
         optimizer = torch.optim.SGD(
-            params, lr=cfg.train.lr, momentum=optim.sgd_momentum, weight_decay=optim.weight_decay
+            params, lr=cfg.train.lr, momentum=optmr.momentum, weight_decay=optmr.weight_decay
         )
 
-    elif optim.name == 'Adam':
+    elif optmr.name == 'Adam':
         optimizer = torch.optim.Adam(
-            params, lr=cfg.train.lr, betas=optim.adam_betas, weight_decay=optim.weight_decay
+            params, lr=cfg.train.lr, betas=optmr.betas, weight_decay=optmr.weight_decay
         )
 
     else:
         raise ValueError('Unsupported optimizer type!')
 
-    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=optim.step_size, gamma=optim.gamma)
-
     auc_max = 0
+    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=schdr.step_size, gamma=schdr.gamma)
     for epoch in range(cfg.train.save_epochs):
         train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=cfg.train.print_freq)
         lr_scheduler.step()
