@@ -6,6 +6,14 @@ import torch
 class ForeignObjectDataset(object):
 
     def __init__(self, data_folder, data_type, labels_dict, resize_size, transform=None):
+        """
+
+        :param data_folder:
+        :param data_type: only support three data types, namely 'train', 'val', and 'test'.
+        :param labels_dict:
+        :param resize_size:
+        :param transform:
+        """
         self.data_folder = data_folder
         self.data_type = data_type
         self.labels_dict = labels_dict
@@ -22,59 +30,66 @@ class ForeignObjectDataset(object):
         width, height = img.size[0], img.size[1]
 
         if self.data_type == 'train':
-            annotation = self.labels_dict[img_name]
+            annot_boxes_coords, annot_boxes_labels = [], []
 
-            boxes = []
-            if type(annotation) == str:
-                annotation_list = annotation.split(';')
-                for anno in annotation_list:
-                    x = []
-                    y = []
-
-                    anno = anno[2:]
-                    anno = anno.split(' ')
-                    for i in range(len(anno)):
+            multiple_annots_txt = self.labels_dict[img_name]
+            if type(multiple_annots_txt) == str:
+                multiple_annots_txt = multiple_annots_txt.split(';')
+                for single_annot_txt in multiple_annots_txt:
+                    x, y = [], []
+                    single_annot_coords = single_annot_txt[2:].split(' ')
+                    for i in range(len(single_annot_coords)):
                         if i % 2 == 0:
-                            x.append(float(anno[i]))
+                            x.append(float(single_annot_coords[i]))
                         else:
-                            y.append(float(anno[i]))
+                            y.append(float(single_annot_coords[i]))
 
-                    xmin = min(x) / width * self.resize_size[0]
-                    xmax = max(x) / width * self.resize_size[0]
-                    ymin = min(y) / height * self.resize_size[1]
-                    ymax = max(y) / height * self.resize_size[1]
-                    boxes.append([xmin, ymin, xmax, ymax])
+                    xmin, xmax = min(x) / width, max(x) / width
+                    ymin, ymax = min(y) / height, max(y) / height
 
-            # convert everything into a torch.Tensor
-            boxes = torch.as_tensor(boxes, dtype=torch.float32)
-            # there is only one class
-            labels = torch.ones((len(boxes),), dtype=torch.int64)
+                    if self.resize_size is not None:
+                        xmin, xmax = xmin * self.resize_size[0], xmax * self.resize_size[0]
+                        ymin, ymax = ymin * self.resize_size[1], ymax * self.resize_size[1]
+
+                    annot_boxes_coords.append([xmin, ymin, xmax, ymax])
+
+            # convert the coordinates and labels of the annotated boxes to torch.Tensor
+            annot_boxes_coords = torch.as_tensor(annot_boxes_coords, dtype=torch.float32)
+            annot_boxes_labels = torch.ones((len(annot_boxes_coords),), dtype=torch.int64)
 
             image_id = torch.tensor([idx])
-            area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
-            # suppose all instances are not crowd
-            iscrowd = torch.zeros((len(boxes),), dtype=torch.int64)
+            boxes_area = (annot_boxes_coords[:, 3] - annot_boxes_coords[:, 1]) * \
+                       (annot_boxes_coords[:, 2] - annot_boxes_coords[:, 0])
 
-            target = {}
-            target["boxes"] = boxes
-            target["labels"] = labels
-            target["image_id"] = image_id
-            target["area"] = area
-            target["iscrowd"] = iscrowd
+            # suppose all instances are not crowd
+            is_crowd = torch.zeros((len(annot_boxes_coords),), dtype=torch.int64)
+
+            target = {
+                "boxes": annot_boxes_coords,
+                "labels": annot_boxes_labels,
+                "image_id": image_id,
+                "area": boxes_area,
+                "is_crowd": is_crowd
+            }
 
             if self.transform is not None:
                 img = self.transform(img)
 
             return img, target
 
-        elif self.data_type == 'dev':
-
+        elif self.data_type == 'val':
             label = 0 if self.labels_dict[img_name] == '' else 1
 
             if self.transform is not None:
                 img = self.transform(img)
 
             return img, label, width, height
+
+        elif self.data_type == 'test':
+            if self.transform is not None:
+                img = self.transform(img)
+
+            return img, width, height
 
         else:
             raise ValueError('Unsupported dataset type!')

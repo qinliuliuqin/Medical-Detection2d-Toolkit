@@ -9,7 +9,7 @@ import torch
 
 from detection2d.dataset.foreigen_object_dataset import ForeignObjectDataset
 from detection2d.core.engine import train_one_epoch
-from detection2d.utils import utils, file_io
+from detection2d.utils import train_utils, file_io
 
 
 def train(config_file, gpu_id):
@@ -68,15 +68,15 @@ def train(config_file, gpu_id):
     data_loader = torch.utils.data.DataLoader(
         dataset_train,
         batch_size=cfg.train.batch_size,
-        shuffle= True,
+        shuffle=True,
         num_workers=cfg.train.batch_size,
-        collate_fn=utils.collate_fn
+        collate_fn=train_utils.collate_fn
     )
 
     # load validation dataset
     dataset_dev = ForeignObjectDataset(
         data_folder=data_folder_dev,
-        data_type='dev',
+        data_type='val',
         transform=cfg.data_transforms,
         labels_dict=img_class_dict_dev,
         resize_size=cfg.dataset.resize_size
@@ -86,7 +86,7 @@ def train(config_file, gpu_id):
         batch_size=1,
         shuffle=False,
         num_workers=1,
-        collate_fn=utils.collate_fn
+        collate_fn=train_utils.collate_fn
     )
 
     model_module = importlib.import_module('detection2d.network.' + cfg.net.name)
@@ -165,10 +165,10 @@ def main():
     parser = argparse.ArgumentParser(description=long_description)
 
     parser.add_argument('-i', '--input',
-                        default='/home/qinliu19/projects/Medical-Detection2d-Toolkit/detection2d/config/train_config.py',
+                        default='/home/ql/projects/Medical-Detection2d-Toolkit/detection2d/config/train_config.py',
                         help='configure file for medical image segmentation training.')
     parser.add_argument('-g', '--gpus',
-                        default=4,
+                        default=-1,
                         help='the device id of gpus.')
     args = parser.parse_args()
 
