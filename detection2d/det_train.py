@@ -7,7 +7,7 @@ import shutil
 from sklearn.metrics import roc_auc_score
 import torch
 
-from detection2d.dataset.foreigen_object_dataset import ForeignObjectDataset
+from detection2d.dataset.object_detection_dataset import ObjectDetectionDataset
 from detection2d.core.engine import train_one_epoch
 from detection2d.utils import train_utils, file_io
 
@@ -58,7 +58,7 @@ def train(config_file, gpu_id):
     img_class_dict_dev = dict(zip(labels_dev.image_name, labels_dev.annotation))
 
     # load training dataset
-    dataset_train = ForeignObjectDataset(
+    dataset_train = ObjectDetectionDataset(
         data_folder=data_folder_tr,
         data_type='train',
         transform=cfg.data_transforms,
@@ -74,7 +74,7 @@ def train(config_file, gpu_id):
     )
 
     # load validation dataset
-    dataset_dev = ForeignObjectDataset(
+    dataset_dev = ObjectDetectionDataset(
         data_folder=data_folder_dev,
         data_type='val',
         transform=cfg.data_transforms,

@@ -3,7 +3,7 @@ from PIL import Image
 import torch
 
 
-class ForeignObjectDataset(object):
+class ObjectDetectionDataset(object):
 
     def __init__(self, data_folder, data_type, labels_dict, resize_size, transform=None):
         """
