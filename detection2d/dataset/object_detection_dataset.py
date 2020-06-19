@@ -5,21 +5,22 @@ import torch
 
 class ObjectDetectionDataset(object):
 
-    def __init__(self, data_folder, data_type, labels_dict, resize_size, transform=None):
+    def __init__(self, data_folder, data_type, labels_dict, resize_size, transforms=None, augmentations=None):
         """
 
         :param data_folder:
         :param data_type: only support three data types, namely 'train', 'val', and 'test'.
         :param labels_dict:
         :param resize_size:
-        :param transform:
+        :param transforms:
         """
         self.data_folder = data_folder
         self.data_type = data_type
         self.labels_dict = labels_dict
         self.resize_size = resize_size
         self.image_files_list = [s for s in sorted(os.listdir(data_folder)) if s in labels_dict.keys()]
-        self.transform = transform
+        self.transform = transforms
+        self.augmentations = augmentations
         self.annotations = [labels_dict[i] for i in self.image_files_list]
 
     def __getitem__(self, idx):
@@ -58,8 +59,8 @@ class ObjectDetectionDataset(object):
             annot_boxes_labels = torch.ones((len(annot_boxes_coords),), dtype=torch.int64)
 
             image_id = torch.tensor([idx])
-            boxes_area = (annot_boxes_coords[:, 3] - annot_boxes_coords[:, 1]) * \
-                       (annot_boxes_coords[:, 2] - annot_boxes_coords[:, 0])
+            annot_boxes_area = (annot_boxes_coords[:, 3] - annot_boxes_coords[:, 1]) * \
+                               (annot_boxes_coords[:, 2] - annot_boxes_coords[:, 0])
 
             # suppose all instances are not crowd
             is_crowd = torch.zeros((len(annot_boxes_coords),), dtype=torch.int64)
@@ -68,12 +69,16 @@ class ObjectDetectionDataset(object):
                 "boxes": annot_boxes_coords,
                 "labels": annot_boxes_labels,
                 "image_id": image_id,
-                "area": boxes_area,
+                "area": annot_boxes_area,
                 "is_crowd": is_crowd
             }
 
             if self.transform is not None:
                 img = self.transform(img)
+
+            if self.augmentations is not None:
+                for augmentation in self.augmentations:
+                    img, annot_boxes_coords = augmentation(img, annot_boxes_coords)
 
             return img, target
 
