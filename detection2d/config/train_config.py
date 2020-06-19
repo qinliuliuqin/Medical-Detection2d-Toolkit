@@ -1,31 +1,29 @@
 from easydict import EasyDict as edict
-import torchvision.transforms as transforms
+
+from detection2d.utils.data_augmt import *
 
 
 __C = edict()
 cfg = __C
-
-WIDTH = 600
-HEIGHT = 600
 
 ##################################
 # general parameters
 ##################################
 __C.general = {}
 
-__C.general.train_label_file = '/shenlab/lab_stor6/projects/CXR_Object/train.csv'
+__C.general.train_label_file = '/mnt/projects/CXR_Object/dataset/train_label_debug.csv'
 
-__C.general.train_image_folder = '/shenlab/lab_stor6/projects/CXR_Object/train'
+__C.general.train_image_folder = '/mnt/projects/CXR_Object/data/train'
 
-__C.general.val_label_file = '/shenlab/lab_stor6/projects/CXR_Object/dev.csv'
+__C.general.val_label_file = '/mnt/projects/CXR_Object/dataset/dev_label_debug.csv'
 
-__C.general.val_image_folder = '/shenlab/lab_stor6/projects/CXR_Object/dev'
+__C.general.val_image_folder = '/mnt/projects/CXR_Object/data/dev'
 
-__C.general.save_dir = '/mnt/projects/CXR_Object/models/model_0610_2020'
+__C.general.save_dir = '/mnt/projects/CXR_Object/models/model_0618_2020_debug'
 
 __C.general.resume_epoch = -1
 
-__C.general.num_gpus = 1
+__C.general.num_gpus = 0
 
 ##################################
 # dataset parameters
@@ -34,16 +32,16 @@ __C.dataset = {}
 
 __C.dataset.num_classes = 2
 
-__C.dataset.resize_size = [WIDTH, HEIGHT]
+__C.dataset.resize_size = [600, 600]
 
 ##################################
 # data augmentation parameters
 ##################################
-__C.data_transforms = transforms.Compose([
-    transforms.Resize((WIDTH, HEIGHT)),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-])
+
+__C.data_augmentations = [
+    RandomHorizontalFlip(),
+    RandomTranslate()
+]
 
 ##################################
 # net
@@ -61,15 +59,15 @@ __C.train = {}
 
 __C.train.epochs = 101
 
-__C.train.batch_size = 12
+__C.train.batch_size = 1
 
-__C.train.num_threads = 12
+__C.train.num_threads = 1
 
 __C.train.lr = 0.005
 
 __C.train.save_epochs = 100
 
-__C.train.print_freq = 20
+__C.train.print_freq = 1
 
 ##################################
 # optimizer parameters

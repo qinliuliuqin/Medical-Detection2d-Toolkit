@@ -13,7 +13,6 @@ class ObjectDetectionDataset(object):
         :param data_type: only support three data types, namely 'train', 'val', and 'test'.
         :param labels_dict:
         :param resize_size:
-        :param transforms:
         """
         self.data_folder = data_folder
         self.data_type = data_type
@@ -76,11 +75,11 @@ class ObjectDetectionDataset(object):
             if self.resize_size is not None:
                 img = transforms.Resize(self.resize_size)(img)
 
-            if self.augmentations is not None:
-                for augmentation in self.augmentations:
-                    img, annot_boxes_coords = augmentation(img, annot_boxes_coords)
+            # if self.augmentations is not None:
+            #     for augmentation in self.augmentations:
+            #         img, annot_boxes_coords = augmentation(img, annot_boxes_coords)
 
-            return img, target
+            return transforms.ToTensor()(img), target
 
         elif self.data_type == 'val':
             label = 0 if self.labels_dict[img_name] == '' else 1
@@ -88,13 +87,13 @@ class ObjectDetectionDataset(object):
             if self.resize_size is not None:
                 img = transforms.Resize(self.resize_size)(img)
 
-            return img, label, width, height
+            return transforms.ToTensor()(img), label, width, height
 
         elif self.data_type == 'test':
             if self.resize_size is not None:
                 img = transforms.Resize(self.resize_size)(img)
 
-            return img, width, height
+            return transforms.ToTensor()(img), width, height
 
         else:
             raise ValueError('Unsupported dataset type!')

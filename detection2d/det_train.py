@@ -61,7 +61,6 @@ def train(config_file, gpu_id):
     dataset_train = ObjectDetectionDataset(
         data_folder=data_folder_tr,
         data_type='train',
-        transform=cfg.data_transforms,
         labels_dict=img_class_dict_tr,
         resize_size=cfg.dataset.resize_size
     )
@@ -77,7 +76,6 @@ def train(config_file, gpu_id):
     dataset_dev = ObjectDetectionDataset(
         data_folder=data_folder_dev,
         data_type='val',
-        transform=cfg.data_transforms,
         labels_dict=img_class_dict_dev,
         resize_size=cfg.dataset.resize_size
     )
