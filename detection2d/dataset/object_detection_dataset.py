@@ -19,7 +19,7 @@ class ObjectDetectionDataset(object):
         self.labels_dict = labels_dict
         self.resize_size = resize_size
         self.image_files_list = [s for s in sorted(os.listdir(data_folder)) if s in labels_dict.keys()]
-        self.transform = transforms
+        self.transforms = transforms
         self.augmentations = augmentations
         self.annotations = [labels_dict[i] for i in self.image_files_list]
 
@@ -73,8 +73,8 @@ class ObjectDetectionDataset(object):
                 "is_crowd": is_crowd
             }
 
-            if self.transform is not None:
-                img = self.transform(img)
+            if self.transforms is not None:
+                img = self.transforms(img)
 
             if self.augmentations is not None:
                 for augmentation in self.augmentations:
@@ -85,14 +85,14 @@ class ObjectDetectionDataset(object):
         elif self.data_type == 'val':
             label = 0 if self.labels_dict[img_name] == '' else 1
 
-            if self.transform is not None:
-                img = self.transform(img)
+            if self.transforms is not None:
+                img = self.transforms(img)
 
             return img, label, width, height
 
         elif self.data_type == 'test':
-            if self.transform is not None:
-                img = self.transform(img)
+            if self.transforms is not None:
+                img = self.transforms(img)
 
             return img, width, height
 
