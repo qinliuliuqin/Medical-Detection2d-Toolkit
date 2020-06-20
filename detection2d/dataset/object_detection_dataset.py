@@ -44,12 +44,12 @@ class ObjectDetectionDataset(object):
                         else:
                             y.append(float(single_annot_coords[i]))
 
-                    xmin, xmax = min(x) / width, max(x) / width
-                    ymin, ymax = min(y) / height, max(y) / height
+                    xmin, xmax = min(x), max(x)
+                    ymin, ymax = min(y), max(y)
 
                     if self.resize_size is not None:
-                        xmin, xmax = xmin * self.resize_size[0], xmax * self.resize_size[0]
-                        ymin, ymax = ymin * self.resize_size[1], ymax * self.resize_size[1]
+                        xmin, xmax = xmin / width * self.resize_size[0], xmax / width * self.resize_size[0]
+                        ymin, ymax = ymin / height * self.resize_size[1], ymax / height * self.resize_size[1]
 
                     annot_boxes_coords.append([xmin, ymin, xmax, ymax])
 
