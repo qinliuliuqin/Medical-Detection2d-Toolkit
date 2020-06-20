@@ -11,11 +11,11 @@ cfg = __C
 ##################################
 __C.general = {}
 
-__C.general.train_label_file = '/mnt/projects/CXR_Object/dataset/train_label_debug.csv'
+__C.general.train_label_file = '/mnt/projects/CXR_Object/dataset/train_label.csv'
 
 __C.general.train_image_folder = '/mnt/projects/CXR_Object/data/train'
 
-__C.general.val_label_file = '/mnt/projects/CXR_Object/dataset/dev_label_debug.csv'
+__C.general.val_label_file = '/mnt/projects/CXR_Object/dataset/dev_label.csv'
 
 __C.general.val_image_folder = '/mnt/projects/CXR_Object/data/dev'
 
@@ -32,7 +32,9 @@ __C.dataset = {}
 
 __C.dataset.num_classes = 2
 
-__C.dataset.resize_size = [600, 600]
+__C.dataset.resize_size = [200, 200]
+
+__C.dataset.normalizer = {'Adaptive': None}  # {'Fixed': {'mean': [0, 0, 0], 'std': [1, 1, 1]}}
 
 ##################################
 # data augmentation parameters

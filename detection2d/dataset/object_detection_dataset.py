@@ -6,7 +6,7 @@ import torchvision.transforms as transforms
 
 class ObjectDetectionDataset(object):
 
-    def __init__(self, data_folder, data_type, labels_dict, resize_size, augmentations=None):
+    def __init__(self, data_folder, data_type, labels_dict, resize_size, normalizer, augmentations=None):
         """
 
         :param data_folder:
@@ -18,6 +18,7 @@ class ObjectDetectionDataset(object):
         self.data_type = data_type
         self.labels_dict = labels_dict
         self.resize_size = resize_size
+        self.normalizer = normalizer
         self.image_files_list = [s for s in sorted(os.listdir(data_folder)) if s in labels_dict.keys()]
         self.augmentations = augmentations
         self.annotations = [labels_dict[i] for i in self.image_files_list]
@@ -53,6 +54,20 @@ class ObjectDetectionDataset(object):
 
                     annot_boxes_coords.append([xmin, ymin, xmax, ymax])
 
+            if self.resize_size is not None:
+                img = transforms.Resize(self.resize_size[::-1])(img)
+
+            img = transforms.ToTensor()(img)
+
+            if self.normalizer is not None:
+                if 'Fixed' in self.normalizer:
+                    mean, std = self.normalizer['Fixed']['mean'], self.normalizer['Fixed']['std']
+                    img = transforms.Normalize(mean=mean, std=std)(img)
+
+                if 'Adaptive' in self.normalizer:
+                    mean, std = torch.mean(img, dim=[1, 2]), torch.std(img, dim=[1, 2])
+                    img = transforms.Normalize(mean=list(mean.numpy()), std=list(std.numpy()))(img)
+
             # convert the coordinates and labels of the annotated boxes to torch.Tensor
             annot_boxes_coords = torch.as_tensor(annot_boxes_coords, dtype=torch.float32)
             annot_boxes_labels = torch.ones((len(annot_boxes_coords),), dtype=torch.int64)
@@ -72,14 +87,7 @@ class ObjectDetectionDataset(object):
                 "is_crowd": is_crowd
             }
 
-            if self.resize_size is not None:
-                img = transforms.Resize(self.resize_size[::-1])(img)
-
-            # if self.augmentations is not None:
-            #     for augmentation in self.augmentations:
-            #         img, annot_boxes_coords = augmentation(img, annot_boxes_coords)
-
-            return transforms.ToTensor()(img), target
+            return img, target
 
         elif self.data_type == 'val':
             label = 0 if self.labels_dict[img_name] == '' else 1

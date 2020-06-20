@@ -62,7 +62,8 @@ def train(config_file, gpu_id):
         data_folder=data_folder_tr,
         data_type='train',
         labels_dict=img_class_dict_tr,
-        resize_size=cfg.dataset.resize_size
+        resize_size=cfg.dataset.resize_size,
+        normalizer=cfg.dataset.normalizer
     )
     data_loader = torch.utils.data.DataLoader(
         dataset_train,
@@ -77,7 +78,8 @@ def train(config_file, gpu_id):
         data_folder=data_folder_dev,
         data_type='val',
         labels_dict=img_class_dict_dev,
-        resize_size=cfg.dataset.resize_size
+        resize_size=cfg.dataset.resize_size,
+        normalizer=cfg.dataset.normalizer
     )
     data_loader_val = torch.utils.data.DataLoader(
         dataset_dev,
