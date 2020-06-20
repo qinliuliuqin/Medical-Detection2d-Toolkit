@@ -32,7 +32,7 @@ __C.dataset = {}
 
 __C.dataset.num_classes = 2
 
-__C.dataset.resize_size = [200, 200]
+__C.dataset.resize_size = [800, 800]
 
 __C.dataset.normalizer = {'Adaptive': None}  # {'Fixed': {'mean': [0, 0, 0], 'std': [1, 1, 1]}}
 
