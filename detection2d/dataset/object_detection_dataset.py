@@ -73,7 +73,7 @@ class ObjectDetectionDataset(object):
             }
 
             if self.resize_size is not None:
-                img = transforms.Resize(self.resize_size)(img)
+                img = transforms.Resize(self.resize_size[::-1])(img)
 
             # if self.augmentations is not None:
             #     for augmentation in self.augmentations:
