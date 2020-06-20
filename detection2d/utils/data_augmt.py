@@ -11,27 +11,37 @@ sys.path.append(lib_path)
 
 
 class RandomHorizontalFlip(object):
+
+    """Randomly horizontally flips the Image with the probability *p*
+    Parameters
+    ----------
+    p: float
+        The probability with which the image is flipped
+    Returns
+    -------
+    numpy.ndaaray
+        Flipped image in the numpy format of shape `HxWxC`
+    numpy.ndarray
+        Tranformed bounding box co-ordinates of the format `n x 4` where n is
+        number of bounding boxes and 4 represents `x1,y1,x2,y2` of the box
     """
-    img (tensor): the input img tensor in the shape [channel, width, height]
-    bboxes (tenor):
-    """
+
     def __init__(self, p=0.5):
-        self.p = p
+        self.p = 1
 
     def __call__(self, img, bboxes):
-        if random.random() < 100 * self.p:
-            print('flipped')
-            img_center = np.array(img.shape[1:])[::-1] / 2
+            img_center = np.array(img.shape[:2], dtype=np.int32)[::-1] // 2
             img_center = np.hstack((img_center, img_center))
-            img = img[:, ::-1, :]
-            bboxes[:, [0, 2]] += 2 * (img_center[[0, 2]] - bboxes[:, [0, 2]])
+            if random.random() < self.p:
+                img = img[:, ::-1, :]
+                bboxes[:, [0, 2]] += 2*(img_center[[0, 2]] - bboxes[:, [0, 2]])
 
-            box_w = abs(bboxes[:, 0] - bboxes[:, 2])
+                box_w = abs(bboxes[:, 0] - bboxes[:, 2])
 
-            bboxes[:, 0] -= box_w
-            bboxes[:, 2] += box_w
+                bboxes[:, 0] -= box_w
+                bboxes[:, 2] += box_w
 
-        return img, bboxes
+            return img, bboxes
 
 
 class HorizontalFlip(object):

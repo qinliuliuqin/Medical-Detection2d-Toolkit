@@ -6,13 +6,7 @@ class AdaptiveNormalizer(object):
   Normalize image using z-score normalization.
   """
 
-  def __init__(self, clip_sigma=3, percentile=1):
-    """
-    :param clip_sigma: clip the intensity within the 'clip_sigma' standard deviation. 68% voxels lies within 1
-      standard deviation, 95% within 2 standard deviation, and 99.7% within 3 standard deviation.
-    """
-    assert clip_sigma > 0
-    self.clip_sigma = clip_sigma
+  def __init__(self, percentile=1):
     self.percentile = min(100, max(0, percentile))
 
   def normalize(self, single_image):
@@ -35,8 +29,6 @@ class AdaptiveNormalizer(object):
             return single_image
 
         normalized_color_plane = (color_plane - mean) / stddev
-        normalized_color_plane[normalized_color_plane > self.clip_sigma] = self.clip_sigma
-        normalized_color_plane[normalized_color_plane < -self.clip_sigma] = -self.clip_sigma
         image[:, :, color_idx] = normalized_color_plane
 
     return image
