@@ -3,6 +3,8 @@ from PIL import Image
 import torch
 import torchvision.transforms as transforms
 
+from detection2d.utils.bbox_utils import read_boxes_from_annotation_txt
+
 
 def normalize(image, normalizer):
     """
@@ -49,28 +51,8 @@ class ObjectDetectionDataset(object):
         width, height = img.size[0], img.size[1]
 
         if self.data_type == 'train':
-            annot_boxes_coords, annot_boxes_labels = [], []
-
-            multiple_annots_txt = self.labels_dict[img_name]
-            if type(multiple_annots_txt) == str:
-                multiple_annots_txt = multiple_annots_txt.split(';')
-                for single_annot_txt in multiple_annots_txt:
-                    x, y = [], []
-                    single_annot_coords = single_annot_txt[2:].split(' ')
-                    for i in range(len(single_annot_coords)):
-                        if i % 2 == 0:
-                            x.append(float(single_annot_coords[i]))
-                        else:
-                            y.append(float(single_annot_coords[i]))
-
-                    xmin, xmax = min(x), max(x)
-                    ymin, ymax = min(y), max(y)
-
-                    if self.resize_size is not None:
-                        xmin, xmax = xmin / width * self.resize_size[0], xmax / width * self.resize_size[0]
-                        ymin, ymax = ymin / height * self.resize_size[1], ymax / height * self.resize_size[1]
-
-                    annot_boxes_coords.append([xmin, ymin, xmax, ymax])
+            annot_boxes_coords, annot_boxes_labels = \
+                read_boxes_from_annotation_txt(self.labels_dict[img_name], [width, height], self.resize_size)
 
             if self.resize_size is not None:
                 img = transforms.Resize(self.resize_size[::-1])(img)
