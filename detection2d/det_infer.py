@@ -4,15 +4,12 @@ import os
 import torch
 from tqdm import tqdm
 from sklearn.metrics import roc_auc_score, roc_curve, auc
-import torchvision.transforms as transforms
 
-from detection2d.utils.utils import collate_fn
-from detection2d.dataset.foreigen_object_dataset import ForeignObjectDataset
+from detection2d.utils.train_utils import collate_fn
+from detection2d.utils.file_io import load_config
+from detection2d.dataset.object_detection_dataset import ObjectDetectionDataset
 from detection2d.network.faster_rcnn import get_detection_model
 
-
-WIDTH = 600
-HEIGHT = 600
 
 def get_device(cuda_id):
     """
@@ -30,7 +27,7 @@ def get_device(cuda_id):
     return device
 
 
-def infer(model_path, data_folder, infer_file, num_classes, save_folder, cuda_id):
+def infer(model_folder, data_folder, infer_file, num_classes, save_folder, cuda_id):
     """
     The inference interface
     :param model_folder:
@@ -44,14 +41,12 @@ def infer(model_path, data_folder, infer_file, num_classes, save_folder, cuda_id
     device = get_device(cuda_id)
     model = get_detection_model(num_classes, False)
     model.to(device)
-    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.load_state_dict(torch.load(model_folder, 'model.pt', map_location=device))
     model.eval()
 
-    data_transforms = transforms.Compose([
-        transforms.Resize((WIDTH, HEIGHT)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
+    infer_cfg = load_config(os.path.join(model_folder, 'infer_config.py'))
+    resize_size = infer_cfg.dataset.resize_size
+    normalizer = infer_cfg.dataset.normalizer
 
     labels_df = pd.read_csv(infer_file, na_filter=False)
     labels_dict = dict(zip(labels_df.image_name, labels_df.annotation))
@@ -59,12 +54,12 @@ def infer(model_path, data_folder, infer_file, num_classes, save_folder, cuda_id
     preds, labels, locs = [], [], []
 
     # load test dataset
-    dataset = ForeignObjectDataset(
+    dataset = ObjectDetectionDataset(
         data_folder=data_folder,
-        data_type='dev',
-        transform=data_transforms,
+        data_type='val',
         labels_dict=labels_dict,
-        resize_size=[WIDTH, HEIGHT]
+        resize_size=resize_size,
+        normalizer=normalizer
     )
     data_loader = torch.utils.data.DataLoader(
         dataset,
@@ -101,7 +96,10 @@ def infer(model_path, data_folder, infer_file, num_classes, save_folder, cuda_id
                     new_box = new_boxes[i].tolist()
                     center_x = (new_box[0] + new_box[2]) / 2
                     center_y = (new_box[1] + new_box[3]) / 2
-                    center_points.append([center_x / WIDTH * width[-1], center_y / HEIGHT * height[-1]])
+                    if resize_size is not None:
+                        center_points.append([center_x / resize_size[0] * width[-1], center_y / resize_size[1] * height[-1]])
+                    else:
+                        center_points.append([center_x, center_y])
                 center_points_preds += new_scores.tolist()
 
                 line = ''
@@ -142,10 +140,9 @@ def main():
     long_description = "Inference engine for 2d medical image object detection"
     parser = argparse.ArgumentParser(description=long_description)
 
-    parser.add_argument('-m', '--model',
-                        default='/shenlab/lab_stor6/qinliu/CXR_Object/models/model_0610_2020/model.pt',
-                        #default='/shenlab/lab_stor6/qinliu/CXR_Object/models/model_0617_2020/adam_contrast/model.pt',
-                        help='Model path.')
+    parser.add_argument('-m', '--model-folder',
+                        default='/shenlab/lab_stor6/qinliu/CXR_Object/models/model_0610_2020/',
+                        help='Model folder containing the model and inference config file.')
     parser.add_argument('-d', '--data-folder',
                         default='/shenlab/lab_stor6/projects/CXR_Object/dev',
                         help='The data folder.')
@@ -163,7 +160,7 @@ def main():
                         help='')
     args = parser.parse_args()
 
-    infer(args.model, args.data_folder, args.infer_file, args.num_classes, args.output, args.gpu)
+    infer(args.model_folder, args.data_folder, args.infer_file, args.num_classes, args.output, args.gpu)
 
 
 if __name__ == '__main__':
