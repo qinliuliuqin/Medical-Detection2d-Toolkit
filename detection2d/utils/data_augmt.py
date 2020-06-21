@@ -4,33 +4,48 @@ import cv2
 import matplotlib.pyplot as plt
 import sys
 import os
+import PIL.Image as Image
 from detection2d.utils.bbox_utils import *
+
 
 lib_path = os.path.join(os.path.realpath("."), "data_aug")
 sys.path.append(lib_path)
 
 
+class augmentation(object):
+
+    def __init__(self, functions):
+        self.functions = functions
+
+    def __call__(self, img, boxes):
+
+        for func in self.functions:
+            img, boxes = func(img, boxes)
+
+        return img, boxes
+
+
 class RandomNegativeAndPositiveFlip(object):
-    """Randomly horizontally flips the Image with the probability *p*
-    Parameters
-    ----------
-    p: float
-        The probability with which the image is flipped
-    Returns
-    -------
-    numpy.ndaaray
-        Flipped image in the numpy format of shape `HxWxC`
-    numpy.ndarray
-        Tranformed bounding box co-ordinates of the format `n x 4` where n is
-        number of bounding boxes and 4 represents `x1,y1,x2,y2` of the box
-    """
+
     def __init__(self, p=0.5):
         self.p = p
 
-    def __call__(self, img):
-        if random.random() < self.p:
-            pass
+    def __call__(self, img, boxes=None):
+        assert isinstance(img, Image.Image)
 
+        if random.random() < self.p:
+            img_npy = np.asarray(img)
+            # do some operations
+            flipped_img_npy = np.copy(np.asarray(img_npy))
+            for idx in range(3):
+                plane = img_npy[:, :, idx]
+                min_val, max_val = np.min(plane), np.max(plane)
+                plane = max_val + min_val - plane
+                flipped_img_npy[:, :, idx] = plane
+
+            img = Image.fromarray(np.uint8(flipped_img_npy))
+
+        return img, boxes
 
 
 

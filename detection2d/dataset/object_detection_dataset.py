@@ -50,29 +50,32 @@ class ObjectDetectionDataset(object):
         width, height = img.size[0], img.size[1]
 
         if self.data_type == 'train':
-            annot_boxes_coords, annot_boxes_labels = \
-                read_boxes_from_annotation_txt(self.labels_dict[img_name], [width, height], self.resize_size)
+            boxes, labels = read_boxes_from_annotation_txt(
+                self.labels_dict[img_name], [width, height], self.resize_size)
 
             if self.resize_size is not None:
                 img = transforms.Resize(self.resize_size[::-1])(img)
 
-            img = transforms.ToTensor()(img)
+            if self.augmentations is not None:
+                img, boxes = self.augmentations(img, boxes)
 
-            if self.normalizer is not None:
-                img = self.normalize(img, self.normalizer)
+            # img = transforms.ToTensor()(img)
+
+            # if self.normalizer is not None:
+            #     img = self.normalize(img, self.normalizer)
 
             # convert the coordinates and labels of the annotated boxes to torch.Tensor
-            annot_boxes_coords = torch.as_tensor(annot_boxes_coords, dtype=torch.float32)
-            annot_boxes_labels = torch.ones((len(annot_boxes_coords),), dtype=torch.int64)
+            boxes = torch.as_tensor(boxes, dtype=torch.float32)
+            labels = torch.ones((len(boxes),), dtype=torch.int64)
 
             image_id = torch.tensor([idx])
-            annot_boxes_area = (annot_boxes_coords[:, 3] - annot_boxes_coords[:, 1]) * \
-                               (annot_boxes_coords[:, 2] - annot_boxes_coords[:, 0])
+            annot_boxes_area = (boxes[:, 3] - boxes[:, 1]) * \
+                               (boxes[:, 2] - boxes[:, 0])
 
             # suppose all instances are not crowd
-            is_crowd = torch.zeros((len(annot_boxes_coords),), dtype=torch.int64)
+            is_crowd = torch.zeros((len(boxes),), dtype=torch.int64)
 
-            target = {"boxes": annot_boxes_coords, "labels": annot_boxes_labels,
+            target = {"boxes": boxes, "labels": labels,
                       "image_id": image_id, "area": annot_boxes_area, "is_crowd": is_crowd}
 
             return img, target
