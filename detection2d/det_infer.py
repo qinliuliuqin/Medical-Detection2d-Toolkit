@@ -144,10 +144,10 @@ def main():
                         default='/shenlab/lab_stor6/qinliu/projects/CXR_Object/models/model_0620_2020/contrast_fixed_normalizer',
                         help='Model folder containing the model and inference config file.')
     parser.add_argument('-d', '--data-folder',
-                        default='/shenlab/lab_stor6/projects/CXR_Object/dev',
+                        default='/shenlab/lab_stor6/projects/CXR_Object/data/dev',
                         help='The data folder.')
     parser.add_argument('-i', '--infer-file',
-                        default='/shenlab/lab_stor6/projects/CXR_Object/dev.csv',
+                        default='/shenlab/lab_stor6/projects/CXR_Object/dataset/dev.csv',
                         help='')
     parser.add_argument('-n', '--num-classes',
                         default=2,
