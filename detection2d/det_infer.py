@@ -39,7 +39,7 @@ def infer(model_folder, data_folder, infer_file, num_classes, save_folder, cuda_
     """
     # load model
     device = get_device(cuda_id)
-    model = get_detection_model(num_classes, False)
+    model = get_detection_model(num_classes, False, image_mean=0, image_std=1)
     model.to(device)
     model.load_state_dict(torch.load(os.path.join(model_folder, 'model.pt'), map_location=device))
     model.eval()
