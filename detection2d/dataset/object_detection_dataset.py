@@ -59,10 +59,10 @@ class ObjectDetectionDataset(object):
             if self.augmentations is not None:
                 img, boxes = self.augmentations(img, boxes)
 
-            # img = transforms.ToTensor()(img)
+            img = transforms.ToTensor()(img)
 
-            # if self.normalizer is not None:
-            #     img = self.normalize(img, self.normalizer)
+            if self.normalizer is not None:
+                img = self.normalize(img, self.normalizer)
 
             # convert the coordinates and labels of the annotated boxes to torch.Tensor
             boxes = torch.as_tensor(boxes, dtype=torch.float32)
