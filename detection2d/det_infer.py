@@ -141,7 +141,7 @@ def main():
     parser = argparse.ArgumentParser(description=long_description)
 
     parser.add_argument('-m', '--model-folder',
-                        default='/shenlab/lab_stor6/qinliu/CXR_Object/models/model_0610_2020/',
+                        default='/shenlab/lab_stor6/qinliu/projects/CXR_Object/models/model_0620_2020/contrast_fixed_normalizer',
                         help='Model folder containing the model and inference config file.')
     parser.add_argument('-d', '--data-folder',
                         default='/shenlab/lab_stor6/projects/CXR_Object/dev',
@@ -153,7 +153,7 @@ def main():
                         default=2,
                         help='')
     parser.add_argument('-o', '--output',
-                        default='/shenlab/lab_stor6/qinliu/CXR_Object/results/model_0617_2020',
+                        default='/shenlab/lab_stor6/qinliu/projects/CXR_Object/results/model_0620_2020/contrast_fixed_normalizer/dev',
                         help='')
     parser.add_argument('-g', '--gpu',
                         default=6,

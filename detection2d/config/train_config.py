@@ -11,19 +11,19 @@ cfg = __C
 ##################################
 __C.general = {}
 
-__C.general.train_label_file = '/mnt/projects/CXR_Object/dataset/train_label.csv'
+__C.general.train_label_file = '/shenlab/lab_stor6/projects/CXR_Object/dataset/train_label.csv'
 
-__C.general.train_image_folder = '/mnt/projects/CXR_Object/data/train'
+__C.general.train_image_folder = '/shenlab/lab_stor6/projects/CXR_Object/data/train'
 
-__C.general.val_label_file = '/mnt/projects/CXR_Object/dataset/dev_label.csv'
+__C.general.val_label_file = '/shenlab/lab_stor6/projects/CXR_Object/dataset/dev_label.csv'
 
-__C.general.val_image_folder = '/mnt/projects/CXR_Object/data/dev'
+__C.general.val_image_folder = '/shenlab/lab_stor6/projects/CXR_Object/data/dev'
 
-__C.general.save_dir = '/mnt/projects/CXR_Object/models/model_0618_2020_debug'
+__C.general.save_dir = '/shenlab/lab_stor6/qinliu/projects/CXR_Object/models/model_0620_2020/contrast_fixed_normalizer_no_weight_decay'
 
 __C.general.resume_epoch = -1
 
-__C.general.num_gpus = 0
+__C.general.num_gpus = 1
 
 ##################################
 # dataset parameters
@@ -32,9 +32,9 @@ __C.dataset = {}
 
 __C.dataset.num_classes = 2
 
-__C.dataset.resize_size = [800, 800]
+__C.dataset.resize_size = [600, 600]
 
-__C.dataset.normalizer = {'Adaptive': None}  # {'Fixed': {'mean': [0, 0, 0], 'std': [1, 1, 1]}}
+__C.dataset.normalizer = {'Fixed': {'mean': [0.485, 0.456, 0.406], 'std': [0.229, 0.224, 0.225]}}
 
 ##################################
 # data augmentation parameters
@@ -61,15 +61,15 @@ __C.train = {}
 
 __C.train.epochs = 101
 
-__C.train.batch_size = 1
+__C.train.batch_size = 12
 
-__C.train.num_threads = 1
+__C.train.num_threads = 12
 
-__C.train.lr = 0.005
+__C.train.lr = 0.0001
 
 __C.train.save_epochs = 100
 
-__C.train.print_freq = 1
+__C.train.print_freq = 20
 
 ##################################
 # optimizer parameters
@@ -77,13 +77,13 @@ __C.train.print_freq = 1
 
 __C.train.optimizer = {}
 
-__C.train.optimizer.name = 'SGD' # 'SGD' or 'Adam'
+__C.train.optimizer.name = 'Adam' # 'SGD' or 'Adam'
 
 __C.train.optimizer.momentum = 0.9  # used for SGD
 
 __C.train.optimizer.betas = (0.9, 0.999)  # used for Adam
 
-__C.train.optimizer.weight_decay = 0.0005
+__C.train.optimizer.weight_decay = 0.0
 
 ##################################
 # scheduler parameters
@@ -93,7 +93,7 @@ __C.train.scheduler = {}
 
 __C.train.scheduler.step_size = 5
 
-__C.train.scheduler.gamma = 0.1
+__C.train.scheduler.gamma = 0.9
 
 ##################################
 # debug parameters
