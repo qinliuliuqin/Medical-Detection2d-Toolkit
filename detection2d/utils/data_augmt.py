@@ -40,7 +40,7 @@ class RandomNegativeAndPositiveFlip(object):
             for idx in range(3):
                 plane = img_npy[:, :, idx]
                 min_val, max_val = np.min(plane), np.max(plane)
-                plane = max_val + min_val - plane
+                plane = (max_val - plane) + min_val
                 flipped_img_npy[:, :, idx] = plane
 
             img = Image.fromarray(np.uint8(flipped_img_npy))
