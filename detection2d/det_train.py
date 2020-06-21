@@ -64,7 +64,8 @@ def train(config_file, gpu_id):
         data_type='train',
         labels_dict=img_class_dict_tr,
         resize_size=cfg.dataset.resize_size,
-        normalizer=cfg.dataset.normalizer
+        normalizer=cfg.dataset.normalizer,
+        augmentations=cfg.augmentations
     )
     data_loader = torch.utils.data.DataLoader(
         dataset_train,
