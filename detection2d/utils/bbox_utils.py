@@ -2,6 +2,39 @@ import cv2
 import numpy as np
 
 
+def read_boxes_from_annotation_txt(annotation_txt, image_size, resize_size):
+    """ Read boxes information from the annotation txt.
+
+    :param annotation_txt:
+    :param image_size:
+    :param resize_size:
+    :return:
+    """
+    annot_boxes_coords, annot_boxes_labels = [], []
+
+    if type(annotation_txt) == str:
+        annotation_txt = annotation_txt.split(';')
+        for single_annot_txt in annotation_txt:
+            x, y = [], []
+            single_annot_coords = single_annot_txt[2:].split(' ')
+            for i in range(len(single_annot_coords)):
+                if i % 2 == 0:
+                    x.append(float(single_annot_coords[i]))
+                else:
+                    y.append(float(single_annot_coords[i]))
+
+            xmin, xmax = min(x), max(x)
+            ymin, ymax = min(y), max(y)
+
+            if resize_size is not None:
+                xmin, xmax = xmin / image_size[0] * resize_size[0], xmax / image_size[0] * resize_size[0]
+                ymin, ymax = ymin / image_size[1] * resize_size[1], ymax / image_size[1] * resize_size[1]
+
+            annot_boxes_coords.append([xmin, ymin, xmax, ymax])
+
+    return annot_boxes_coords, annot_boxes_labels
+
+
 def draw_rect(im, cords, color=None):
     """Draw the rectangle on the image
 
