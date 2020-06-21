@@ -41,7 +41,7 @@ def infer(model_folder, data_folder, infer_file, num_classes, save_folder, cuda_
     device = get_device(cuda_id)
     model = get_detection_model(num_classes, False)
     model.to(device)
-    model.load_state_dict(torch.load(model_folder, 'model.pt', map_location=device))
+    model.load_state_dict(torch.load(os.path.join(model_folder, 'model.pt'), map_location=device))
     model.eval()
 
     infer_cfg = load_config(os.path.join(model_folder, 'infer_config.py'))
