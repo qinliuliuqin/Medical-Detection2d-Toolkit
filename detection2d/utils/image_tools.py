@@ -4,24 +4,6 @@ import torch
 import torchvision.transforms as transforms
 
 
-def normalize(image, normalizer):
-    """
-    Normalize the input image given the normalizer
-    :param image:
-    :param normalizer:
-    :return:
-    """
-    if 'Fixed' in normalizer:
-        mean, std = normalizer['Fixed']['mean'], normalizer['Fixed']['std']
-        image = transforms.Normalize(mean=mean, std=std)(image)
-
-    if 'Adaptive' in normalizer:
-        mean, std = torch.mean(image, dim=[1, 2]), torch.std(image, dim=[1, 2])
-        image = transforms.Normalize(mean=list(mean.numpy()), std=list(std.numpy()))(image)
-
-    return image
-
-
 def convert_to_PIL_image(image_npy, mode=None):
     """
     Convert numpy to PIL.Image
