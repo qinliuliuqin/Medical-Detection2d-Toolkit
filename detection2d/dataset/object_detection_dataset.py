@@ -72,13 +72,8 @@ class ObjectDetectionDataset(object):
             # suppose all instances are not crowd
             is_crowd = torch.zeros((len(annot_boxes_coords),), dtype=torch.int64)
 
-            target = {
-                "boxes": annot_boxes_coords,
-                "labels": annot_boxes_labels,
-                "image_id": image_id,
-                "area": annot_boxes_area,
-                "is_crowd": is_crowd
-            }
+            target = {"boxes": annot_boxes_coords, "labels": annot_boxes_labels,
+                      "image_id": image_id, "area": annot_boxes_area, "is_crowd": is_crowd}
 
             return img, target
 
