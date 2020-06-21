@@ -30,7 +30,7 @@ def train(config_file, gpu_id):
     # create save folder if it does not exist
     if not os.path.isdir(cfg.general.save_dir):
         os.makedirs(cfg.general.save_dir)
-        shutil.copy(os.path.join(os.path.dirname(config_file), 'infer_cfg.py'), cfg.general.save_dir)
+        shutil.copy(os.path.join(os.path.dirname(config_file), 'infer_config.py'), cfg.general.save_dir)
 
     # Update training config file
     shutil.copy(config_file, os.path.join(cfg.general.save_dir, os.path.basename(config_file)))
