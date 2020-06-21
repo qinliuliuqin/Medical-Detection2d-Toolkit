@@ -166,10 +166,10 @@ def main():
     parser = argparse.ArgumentParser(description=long_description)
 
     parser.add_argument('-i', '--input',
-                        default='/home/ql/projects/Medical-Detection2d-Toolkit/detection2d/config/train_config.py',
+                        default='/home/qinliu19/projects/Medical-Detection2d-Toolkit/detection2d/config/train_config.py',
                         help='configure file for medical image segmentation training.')
     parser.add_argument('-g', '--gpus',
-                        default=-1,
+                        default=2,
                         help='the device id of gpus.')
     args = parser.parse_args()
 
