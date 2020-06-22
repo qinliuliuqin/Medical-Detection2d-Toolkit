@@ -56,11 +56,6 @@ class ObjectDetectionDataset(object):
                 boxes = resize_bounding_box(boxes, [width, height], self.resize_size)
                 img = transforms.Resize(self.resize_size[::-1])(img)
 
-            # debug only
-            for box in boxes:
-                xmin, ymin, xmax, ymax = box[0], box[1], box[2], box[3]
-                box[0], box[1], box[2], box[3] = ymin, xmin, ymax, xmax
-
             # convert img and boxes to numpy for data augmentation
             if self.augmentations is not None:
                 img, boxes = np.array(img), np.array(boxes)
