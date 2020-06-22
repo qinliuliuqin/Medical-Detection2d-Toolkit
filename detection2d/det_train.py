@@ -120,7 +120,7 @@ def train(config_file, gpu_id):
 
     auc_max = 0
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=schdr.step_size, gamma=schdr.gamma)
-    for epoch in range(cfg.train.save_epochs):
+    for epoch in range(cfg.train.epochs):
         train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq=cfg.train.print_freq)
         lr_scheduler.step(epoch)
 

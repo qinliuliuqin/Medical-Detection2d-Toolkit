@@ -66,8 +66,6 @@ __C.train.num_threads = 12
 
 __C.train.lr = 0.0001
 
-__C.train.save_epochs = 100
-
 __C.train.print_freq = 20
 
 ##################################
