@@ -74,7 +74,7 @@ def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_fo
     )
 
     with torch.no_grad():
-        for image, label, width, height in tqdm(data_loader):
+        for image, width, height in tqdm(data_loader):
 
             image = list(img.to(device) for img in image)
             outputs = model(image)
