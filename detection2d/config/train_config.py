@@ -19,7 +19,7 @@ __C.general.val_label_file = '/shenlab/lab_stor6/projects/CXR_Object/dataset/dev
 
 __C.general.val_image_folder = '/shenlab/lab_stor6/projects/CXR_Object/data/dev'
 
-__C.general.save_dir = '/shenlab/lab_stor6/qinliu/projects/CXR_Object/models/model_0620_2020/contrast_fixed_normalizer_no_weight_decay'
+__C.general.save_dir = '/shenlab/lab_stor6/qinliu/projects/CXR_Object/models/model_0622_2020/contrast_flip'
 
 __C.general.resume_epoch = -1
 
@@ -61,7 +61,7 @@ __C.net.pre_trained = True
 ##################################
 __C.train = {}
 
-__C.train.epochs = 101
+__C.train.epochs = 31
 
 __C.train.batch_size = 12
 
