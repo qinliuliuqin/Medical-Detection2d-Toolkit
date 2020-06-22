@@ -41,7 +41,6 @@ class ObjectDetectionDataset(object):
         self.normalizer = normalizer
         self.image_files_list = [s for s in sorted(os.listdir(data_folder)) if s in labels_dict.keys()]
         self.augmentations = augmentations
-        self.annotations = [labels_dict[i] for i in self.image_files_list]
 
     def __getitem__(self, idx):
         # load images
@@ -64,7 +63,6 @@ class ObjectDetectionDataset(object):
                 img = Image.fromarray(np.uint8(img))
 
             img = transforms.ToTensor()(img)
-
             if self.normalizer is not None:
                 img = self.normalize(img, self.normalizer)
 
@@ -87,10 +85,9 @@ class ObjectDetectionDataset(object):
             label = 0 if self.labels_dict[img_name] == '' else 1
 
             if self.resize_size is not None:
-                img = transforms.Resize(self.resize_size)(img)
+                img = transforms.Resize(self.resize_size[::-1])(img)
 
             img = transforms.ToTensor()(img)
-
             if self.normalizer is not None:
                 img = self.normalize(img, self.normalizer)
 
@@ -98,9 +95,19 @@ class ObjectDetectionDataset(object):
 
         elif self.data_type == 'test':
             if self.resize_size is not None:
-                img = transforms.Resize(self.resize_size)(img)
+                img = transforms.Resize(self.resize_size[::-1])(img)
 
-            return transforms.ToTensor()(img), width, height
+            # convert img and boxes to numpy for data augmentation
+            if self.augmentations is not None:
+                img = np.array(img)
+                img, _ = self.augmentations(img, None)
+                img = Image.fromarray(np.uint8(img))
+
+            img = transforms.ToTensor()(img)
+            if self.normalizer is not None:
+                img = self.normalize(img, self.normalizer)
+
+            return img, width, height
 
         else:
             raise ValueError('Unsupported dataset type!')

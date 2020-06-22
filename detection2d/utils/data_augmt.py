@@ -68,12 +68,12 @@ class RandomHorizontalFlip(object):
         img_center = np.hstack((img_center, img_center))
         if random.random() < self.p:
             img = img[:, ::-1, :]
-            bboxes[:, [0, 2]] += 2*(img_center[[0, 2]] - bboxes[:, [0, 2]])
 
-            box_w = abs(bboxes[:, 0] - bboxes[:, 2])
-
-            bboxes[:, 0] -= box_w
-            bboxes[:, 2] += box_w
+            if bboxes is not None:
+                bboxes[:, [0, 2]] += 2*(img_center[[0, 2]] - bboxes[:, [0, 2]])
+                box_w = abs(bboxes[:, 0] - bboxes[:, 2])
+                bboxes[:, 0] -= box_w
+                bboxes[:, 2] += box_w
 
         return img, bboxes
 
@@ -102,11 +102,12 @@ class RandomVerticalFlip(object):
         img_center = np.hstack((img_center, img_center))
         if random.random() < self.p:
             img = img[::-1, :, :]
-            bboxes[:, [1, 3]] += 2 * (img_center[[1, 3]] - bboxes[:, [1, 3]])
-            box_h = abs(bboxes[:, 1] - bboxes[:, 3])
 
-            bboxes[:, 1] -= box_h
-            bboxes[:, 3] += box_h
+            if bboxes is not None:
+                bboxes[:, [1, 3]] += 2 * (img_center[[1, 3]] - bboxes[:, [1, 3]])
+                box_h = abs(bboxes[:, 1] - bboxes[:, 3])
+                bboxes[:, 1] -= box_h
+                bboxes[:, 3] += box_h
 
         return img, bboxes
 
@@ -133,9 +134,11 @@ class RandomTranspose(object):
     def __call__(self, img, bboxes):
         if random.random() < self.p:
             img = np.transpose(img, axes=[1, 0, 2])
-            for idx in range(len(bboxes)):
-                x1, y1, x2, y2 = bboxes[idx, 0], bboxes[idx, 1], bboxes[idx, 2], bboxes[idx, 3]
-                bboxes[idx, 0], bboxes[idx, 1], bboxes[idx, 2], bboxes[idx, 3] = y1, x1, y2, x2
+
+            if bboxes is not None:
+                for idx in range(len(bboxes)):
+                    x1, y1, x2, y2 = bboxes[idx, 0], bboxes[idx, 1], bboxes[idx, 2], bboxes[idx, 3]
+                    bboxes[idx, 0], bboxes[idx, 1], bboxes[idx, 2], bboxes[idx, 3] = y1, x1, y2, x2
 
         return img, bboxes
 

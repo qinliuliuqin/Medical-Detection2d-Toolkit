@@ -48,20 +48,23 @@ def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_fo
     infer_cfg = load_config(os.path.join(model_folder, 'infer_config.py'))
     resize_size = infer_cfg.dataset.resize_size
     normalizer = infer_cfg.dataset.normalizer
+    augmentation = infer_cfg.augmentations
 
-    labels_df = pd.read_csv(infer_file, na_filter=False)
-    labels_dict = dict(zip(labels_df.image_name, labels_df.annotation))
+    image_names_df = pd.read_csv(infer_file, na_filter=False)
+    image_names_dict = dict(zip(image_names_df.image_name, ''))
 
     preds, labels, locs = [], [], []
 
     # load test dataset
     dataset = ObjectDetectionDataset(
         data_folder=data_folder,
-        data_type='val',
-        labels_dict=labels_dict,
+        data_type='test',
+        labels_dict=image_names_dict,
         resize_size=resize_size,
-        normalizer=normalizer
+        normalizer=normalizer,
+        augmentations=augmentation
     )
+
     data_loader = torch.utils.data.DataLoader(
         dataset,
         batch_size=1,
@@ -74,8 +77,6 @@ def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_fo
         for image, label, width, height in tqdm(data_loader):
 
             image = list(img.to(device) for img in image)
-            labels.append(label[-1])
-
             outputs = model(image)
 
             center_points = []
@@ -132,13 +133,13 @@ def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_fo
     )
     print('localization.csv generated.')
 
-    pred = cls_res.prediction.values
-    gt = labels_df.annotation.astype(bool).astype(float).values
-
-    acc = ((pred >= .5) == gt).mean()
-    fpr, tpr, _ = roc_curve(gt, pred)
-    roc_auc = auc(fpr, tpr)
-    print('ACC: {}'.format(acc), 'AUC: {}'.format(roc_auc))
+    # pred = cls_res.prediction.values
+    # gt = labels_df.annotation.astype(bool).astype(float).values
+    #
+    # acc = ((pred >= .5) == gt).mean()
+    # fpr, tpr, _ = roc_curve(gt, pred)
+    # roc_auc = auc(fpr, tpr)
+    # print('ACC: {}'.format(acc), 'AUC: {}'.format(roc_auc))
 
 
 def main():
