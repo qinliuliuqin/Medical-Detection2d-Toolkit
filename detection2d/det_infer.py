@@ -51,7 +51,7 @@ def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_fo
     augmentation = infer_cfg.augmentations
 
     image_names_df = pd.read_csv(infer_file, na_filter=False)
-    image_names_dict = dict(zip(image_names_df.image_name, ''))
+    image_names_dict = dict(zip(image_names_df.image_name, [0] * len(image_names_df.image_name)))
 
     preds, labels, locs = [], [], []
 
