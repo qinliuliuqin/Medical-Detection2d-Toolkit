@@ -10,7 +10,7 @@ from detection2d.utils.image_tools import *
 
 
 def get_image_and_boxes():
-    resize_size = [400, 600]
+    resize_size = [500, 600]
     # read training and validation label files
     train_label_file = '/mnt/projects/CXR_Object/dataset/train_label.csv'
     train_image_folder = '/mnt/projects/CXR_Object/data/train'
@@ -22,7 +22,12 @@ def get_image_and_boxes():
     labels_tr = labels_tr.loc[labels_tr['annotation'].astype(bool)].reset_index(drop=True)
     img_class_dict_tr = dict(zip(labels_tr.image_name, labels_tr.annotation))
 
-    augmentations = augmentation([RandomNegativeAndPositiveFlip()])
+    augmentations = augmentation([
+        RandomNegativeAndPositiveFlip(),
+        RandomHorizontalFlip(),
+        RandomVerticalFlip(),
+        RandomTranspose()
+    ])
 
     # load training dataset
     dataset_train = ObjectDetectionDataset(
@@ -34,7 +39,7 @@ def get_image_and_boxes():
         augmentations=augmentations
     )
 
-    idx = 12
+    idx = 11
     img, target = dataset_train.__getitem__(idx)
     boxes = target['boxes']
 
@@ -47,7 +52,11 @@ def test_RandomNegativeAndPositiveFlip():
 
 def temp():
 
+    color_red = [255, 25, 25]
+    color_green = [25, 255, 25]
+
     img, boxes = get_image_and_boxes()
+    img = draw_rect(img, boxes, color=color_green)
 
     plt.figure()
     plt.imshow(img)

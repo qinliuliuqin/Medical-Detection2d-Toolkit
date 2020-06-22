@@ -5,11 +5,8 @@ import matplotlib.pyplot as plt
 import sys
 import os
 import PIL.Image as Image
+
 from detection2d.utils.bbox_utils import *
-
-
-lib_path = os.path.join(os.path.realpath("."), "data_aug")
-sys.path.append(lib_path)
 
 
 class augmentation(object):
@@ -31,23 +28,20 @@ class RandomNegativeAndPositiveFlip(object):
         self.p = p
 
     def __call__(self, img, boxes=None):
-        assert isinstance(img, Image.Image)
+        assert isinstance(img, np.ndarray)
 
         if random.random() < self.p:
-            img_npy = np.asarray(img)
-            # do some operations
-            flipped_img_npy = np.copy(np.asarray(img_npy))
+            # The shape of the image numpy should be [H, W, C]
+            flipped_img_npy = np.copy(img)
             for idx in range(3):
-                plane = img_npy[:, :, idx]
+                plane = img[:, :, idx]
                 min_val, max_val = np.min(plane), np.max(plane)
                 plane = (max_val - plane) + min_val
                 flipped_img_npy[:, :, idx] = plane
 
-            img = Image.fromarray(np.uint8(flipped_img_npy))
+            img = flipped_img_npy
 
         return img, boxes
-
-
 
 
 class RandomHorizontalFlip(object):
@@ -67,7 +61,7 @@ class RandomHorizontalFlip(object):
     """
 
     def __init__(self, p=0.5):
-        self.p = 1
+        self.p = p
 
     def __call__(self, img, bboxes):
         img_center = np.array(img.shape[:2], dtype=np.int32)[::-1] // 2
@@ -84,8 +78,71 @@ class RandomHorizontalFlip(object):
         return img, bboxes
 
 
+class RandomVerticalFlip(object):
+
+    """Randomly vertically flips the Image with the probability *p*
+    Parameters
+    ----------
+    p: float
+        The probability with which the image is flipped
+    Returns
+    -------
+    numpy.ndaaray
+        Flipped image in the numpy format of shape `HxWxC`
+    numpy.ndarray
+        Tranformed bounding box co-ordinates of the format `n x 4` where n is
+        number of bounding boxes and 4 represents `x1,y1,x2,y2` of the box
+    """
+
+    def __init__(self, p=0.5):
+        self.p = p
+
+    def __call__(self, img, bboxes):
+        img_center = np.array(img.shape[:2], dtype=np.int32)[::-1] // 2
+        img_center = np.hstack((img_center, img_center))
+        if random.random() < self.p:
+            img = img[::-1, :, :]
+            bboxes[:, [1, 3]] += 2 * (img_center[[1, 3]] - bboxes[:, [1, 3]])
+            box_h = abs(bboxes[:, 1] - bboxes[:, 3])
+
+            bboxes[:, 1] -= box_h
+            bboxes[:, 3] += box_h
+
+        return img, bboxes
+
+
+class RandomTranspose(object):
+
+    """Randomly transpose the Image with the probability *p*
+    Parameters
+    ----------
+    p: float
+        The probability with which the image is flipped
+    Returns
+    -------
+    numpy.ndaaray
+        Flipped image in the numpy format of shape `HxWxC`
+    numpy.ndarray
+        Tranformed bounding box co-ordinates of the format `n x 4` where n is
+        number of bounding boxes and 4 represents `x1,y1,x2,y2` of the box
+    """
+
+    def __init__(self, p=0.5):
+        self.p = p
+
+    def __call__(self, img, bboxes):
+        if random.random() < self.p:
+            img = np.transpose(img, axes=[1, 0, 2])
+            for idx in range(len(bboxes)):
+                x1, y1, x2, y2 = bboxes[idx, 0], bboxes[idx, 1], bboxes[idx, 2], bboxes[idx, 3]
+                bboxes[idx, 0], bboxes[idx, 1], bboxes[idx, 2], bboxes[idx, 3] = y1, x1, y2, x2
+
+        return img, bboxes
+
+
+
 class HorizontalFlip(object):
-    """Randomly horizontally flips the Image with the probability *p*
+    """Horizontally flips the Image with the probability *p*
     Parameters
     ----------
     p: float

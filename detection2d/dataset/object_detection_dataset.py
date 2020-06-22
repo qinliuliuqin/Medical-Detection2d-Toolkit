@@ -1,3 +1,4 @@
+import numpy as np
 import os
 from PIL import Image
 import torch
@@ -56,8 +57,11 @@ class ObjectDetectionDataset(object):
                 boxes = resize_bounding_box(boxes, [width, height], self.resize_size)
                 img = transforms.Resize(self.resize_size[::-1])(img)
 
+            # convert img and boxes to numpy for data augmentation
             if self.augmentations is not None:
+                img, boxes = np.array(img), np.array(boxes)
                 img, boxes = self.augmentations(img, boxes)
+                img = Image.fromarray(np.uint8(img))
 
             img = transforms.ToTensor()(img)
 
@@ -69,8 +73,7 @@ class ObjectDetectionDataset(object):
             labels = torch.ones((len(boxes),), dtype=torch.int64)
 
             image_id = torch.tensor([idx])
-            annot_boxes_area = (boxes[:, 3] - boxes[:, 1]) * \
-                               (boxes[:, 2] - boxes[:, 0])
+            annot_boxes_area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
 
             # suppose all instances are not crowd
             is_crowd = torch.zeros((len(boxes),), dtype=torch.int64)
