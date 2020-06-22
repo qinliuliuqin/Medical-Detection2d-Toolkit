@@ -21,8 +21,8 @@ __C.dataset.normalizer = {'Fixed': {'mean': [0.485, 0.456, 0.406], 'std': [0.229
 # data augmentation parameters
 ##################################
 __C.augmentations = augmentation([
-    RandomNegativeAndPositiveFlip(),
-    RandomHorizontalFlip(),
-    RandomVerticalFlip(),
-    RandomTranspose()
+    # RandomNegativeAndPositiveFlip(),
+    # RandomHorizontalFlip(),
+    # RandomVerticalFlip(),
+    # RandomTranspose()
 ])
