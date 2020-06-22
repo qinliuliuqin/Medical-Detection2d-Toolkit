@@ -39,11 +39,10 @@ def resize_bounding_box(boxes, image_size, resize_size):
     """
 
     if resize_size is not None:
-        resized_boxes = []
         for box in boxes:
-            box[0], box[2] = box[0] / image_size[0] * resize_size[0], box[2] / image_size[0] * resize_size[0]
-            box[1], box[3] = box[1] / image_size[1] * resize_size[1], box[3] / image_size[1] * resize_size[1]
-            resized_boxes.append(box)
+            if len(box) == 4:
+                box[0], box[2] = box[0] / image_size[0] * resize_size[0], box[2] / image_size[0] * resize_size[0]
+                box[1], box[3] = box[1] / image_size[1] * resize_size[1], box[3] / image_size[1] * resize_size[1]
 
     return boxes
 
