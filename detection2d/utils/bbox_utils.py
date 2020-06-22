@@ -2,13 +2,12 @@ import cv2
 import numpy as np
 
 
-def read_boxes_from_annotation_txt(annotation_txt, image_size, resize_size):
+def read_boxes_from_annotation_txt(annotation_txt):
     """ Read boxes information from the annotation txt.
 
     :param annotation_txt:
-    :param image_size:
-    :param resize_size:
     :return:
+        A boxes list and a labels list
     """
     annot_boxes_coords, annot_boxes_labels = [], []
 
@@ -26,13 +25,27 @@ def read_boxes_from_annotation_txt(annotation_txt, image_size, resize_size):
             xmin, xmax = min(x), max(x)
             ymin, ymax = min(y), max(y)
 
-            if resize_size is not None:
-                xmin, xmax = xmin / image_size[0] * resize_size[0], xmax / image_size[0] * resize_size[0]
-                ymin, ymax = ymin / image_size[1] * resize_size[1], ymax / image_size[1] * resize_size[1]
-
             annot_boxes_coords.append([xmin, ymin, xmax, ymax])
 
     return annot_boxes_coords, annot_boxes_labels
+
+
+def resize_bounding_box(boxes, image_size, resize_size):
+    """ Resize bounding boxes
+    :param boxes:
+    :param image_size:
+    :param resize_size:
+    :return:
+    """
+
+    if resize_size is not None:
+        resized_boxes = []
+        for box in boxes:
+            box[0], box[2] = box[0] / image_size[0] * resize_size[0], box[2] / image_size[0] * resize_size[0]
+            box[1], box[3] = box[1] / image_size[1] * resize_size[1], box[3] / image_size[1] * resize_size[1]
+            resized_boxes.append(box)
+
+    return boxes
 
 
 def draw_rect(im, cords, color=None):

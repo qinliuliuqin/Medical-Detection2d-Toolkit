@@ -3,7 +3,7 @@ from PIL import Image
 import torch
 import torchvision.transforms as transforms
 
-from detection2d.utils.bbox_utils import read_boxes_from_annotation_txt
+from detection2d.utils.bbox_utils import read_boxes_from_annotation_txt, resize_bounding_box
 
 
 class ObjectDetectionDataset(object):
@@ -50,10 +50,10 @@ class ObjectDetectionDataset(object):
         width, height = img.size[0], img.size[1]
 
         if self.data_type == 'train':
-            boxes, labels = read_boxes_from_annotation_txt(
-                self.labels_dict[img_name], [width, height], self.resize_size)
+            boxes, labels = read_boxes_from_annotation_txt(self.labels_dict[img_name])
 
             if self.resize_size is not None:
+                boxes = resize_bounding_box(boxes, [width, height], self.resize_size)
                 img = transforms.Resize(self.resize_size[::-1])(img)
 
             if self.augmentations is not None:
