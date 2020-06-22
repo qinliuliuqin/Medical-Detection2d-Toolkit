@@ -27,13 +27,14 @@ def get_device(cuda_id):
     return device
 
 
-def infer(model_folder, data_folder, infer_file, num_classes, save_folder, cuda_id):
+def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_folder, cuda_id):
     """
     The inference interface
     :param model_folder:
     :param model_name:
     :param cuda_id:
     :param num_classes:
+    :param threshold:
     :param save_folder:
     :return:
     """
@@ -86,7 +87,9 @@ def infer(model_folder, data_folder, infer_file, num_classes, save_folder, cuda_
                 center_points_preds.append('')
                 locs.append('')
             else:
-                preds.append(torch.max(outputs[-1]['scores']).tolist())
+                max_pred = torch.max(outputs[-1]['scores']).tolist()
+                if max_pred >= threshold:
+                    preds.append(max_pred)
 
                 new_output_index = torch.where((outputs[-1]['scores'] > 0.1))
                 new_boxes = outputs[-1]['boxes'][new_output_index]
@@ -152,6 +155,9 @@ def main():
     parser.add_argument('-n', '--num-classes',
                         default=2,
                         help='')
+    parser.add_argument('-t', '--threshold',
+                        default=0.5,
+                        help='')
     parser.add_argument('-o', '--output',
                         default='/shenlab/lab_stor6/qinliu/projects/CXR_Object/results/model_0620_2020/contrast_fixed_normalizer/dev',
                         help='')
@@ -160,7 +166,7 @@ def main():
                         help='')
     args = parser.parse_args()
 
-    infer(args.model_folder, args.data_folder, args.infer_file, args.num_classes, args.output, args.gpu)
+    infer(args.model_folder, args.data_folder, args.infer_file, args.num_classes, args.threshold, args.output, args.gpu)
 
 
 if __name__ == '__main__':
