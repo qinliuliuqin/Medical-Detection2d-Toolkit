@@ -1,7 +1,9 @@
 import argparse
 from collections import namedtuple
 import numpy as np
+import pandas as pd
 from skimage.measure import points_in_poly
+from sklearn.metrics import roc_auc_score, roc_curve, auc
 
 Object = namedtuple('Object', ['image_path', 'object_id', 'object_type', 'coordinates'])
 Prediction = namedtuple('Prediction', ['image_path', 'probability', 'coordinates'])
@@ -33,7 +35,7 @@ def inside_object(pred, obj):
         return points_in_poly(pred.coordinates.reshape(1, 2), poly_points)[0]
 
 
-def evaluate(gt_csv_path, pred_csv_path, fps):
+def evaluate_froc(gt_csv_path, pred_csv_path, fps):
     """
     Evaluate the localization error
     :param gt_csv_path:
@@ -130,16 +132,68 @@ def evaluate(gt_csv_path, pred_csv_path, fps):
     print(np.mean(froc))
 
 
+def evaluate_roc_auc_acc(gt_csv_path, pred_csv_paths):
+    """
+    :param gt_csv_path:
+    :param pred_csv_path:
+    :return:
+    """
+    gt_df = pd.read_csv(gt_csv_path, na_filter=False)
+    gt_dict = dict(zip(gt_df.image_name, gt_df.annotation))
+    gt_vals_dict = {}
+    for image_name in gt_dict.keys():
+        gt_vals_dict[image_name] = 0 if len(gt_dict[image_name]) == 0 else 1
+
+    pred_count_dict = {}
+    pred_sum_dict = {}
+    for pred_csv_path in pred_csv_paths:
+        pred_df = pd.read_csv(pred_csv_path, na_filter=False)
+        pred_dict = dict(zip(pred_df.image_name, pred_df.prediction))
+
+        for image_name in pred_dict.keys():
+            probs = [0]
+            coord_predictions = pred_dict[image_name].split(';')
+            for coord_prediction in coord_predictions:
+                if len(coord_prediction) == 0:
+                    continue
+                fields = coord_prediction.split(' ')
+                probs.append(list(map(float, fields))[0])
+
+            pred_sum_dict[image_name] = pred_sum_dict.get(image_name, 0) + max(probs)
+            pred_count_dict[image_name] = pred_count_dict.get(image_name, 0) + 1
+
+    pred_vals_dict = {}
+    for image_name in pred_sum_dict.keys():
+        pred_vals_dict[image_name] = pred_vals_dict.get(image_name, 0) + \
+                                     pred_sum_dict[image_name] / pred_count_dict[image_name]
+    assert len(gt_vals_dict) == len(pred_vals_dict)
+
+    gt, pred = [], []
+    for image_name in pred_vals_dict.keys():
+        gt.append(gt_vals_dict[image_name])
+        pred.append(pred_vals_dict[image_name])
+
+    gt, pred = np.array(gt), np.array(pred)
+    acc = ((pred >= 0.5) == gt).mean()
+    fpr, tpr, _ = roc_curve(gt, pred)
+    roc_auc = auc(fpr, tpr)
+    print('ACC: {}'.format(acc), 'AUC: {}'.format(roc_auc))
+
+
 
 def main():
 
+    default_pred_csv_path = [
+        '/mnt/projects/CXR_Object/results/model_0622_2020/contrast_flip/val/localization.csv'
+    ]
+
     parser = argparse.ArgumentParser(description='Compute FROC')
     parser.add_argument('-g', '--gt-csv',
-                        default='/shenlab/lab_stor6/projects/CXR_Object/dev.csv',
+                        default='/mnt/projects/CXR_Object/dataset/dev.csv',
                         metavar='GT_CSV',
                         help="Path to the ground truch csv file")
     parser.add_argument('-p', '--pred-csv',
-                        default='/shenlab/lab_stor6/qinliu/CXR_Object/results/model_0610_2020/localization.csv',
+                        default=default_pred_csv_path,
                         metavar='PRED_PATH',
                         help="Path to the predicted csv file")
     parser.add_argument('-f', '--fps',
@@ -148,7 +202,8 @@ def main():
 
     args = parser.parse_args()
 
-    evaluate(args.gt_csv, args.pred_csv, args.fps)
+    evaluate_froc(args.gt_csv, args.pred_csv[0], args.fps)
+    evaluate_roc_auc_acc(args.gt_csv, args.pred_csv)
 
 
 if __name__ == '__main__':

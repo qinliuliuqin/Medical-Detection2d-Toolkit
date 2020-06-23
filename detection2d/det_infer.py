@@ -3,7 +3,6 @@ import pandas as pd
 import os
 import torch
 from tqdm import tqdm
-from sklearn.metrics import roc_auc_score, roc_curve, auc
 
 from detection2d.utils.train_utils import collate_fn
 from detection2d.utils.file_io import load_config
@@ -132,14 +131,6 @@ def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_fo
         os.path.join(save_folder, 'localization.csv'), columns=['image_name', 'prediction'], sep=',', index=None
     )
     print('localization.csv generated.')
-
-    # pred = cls_res.prediction.values
-    # gt = labels_df.annotation.astype(bool).astype(float).values
-    #
-    # acc = ((pred >= .5) == gt).mean()
-    # fpr, tpr, _ = roc_curve(gt, pred)
-    # roc_auc = auc(fpr, tpr)
-    # print('ACC: {}'.format(acc), 'AUC: {}'.format(roc_auc))
 
 
 def main():
