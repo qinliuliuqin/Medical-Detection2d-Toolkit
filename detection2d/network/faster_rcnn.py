@@ -3,8 +3,7 @@ from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
 
 def get_detection_model(
-        num_classes,
-        pretrained,
+        num_classes, pretrained,
         # transform parameters
         min_size=800, max_size=1333,
         image_mean=None, image_std=None
