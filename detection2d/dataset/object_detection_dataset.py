@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import pydicom
 from PIL import Image
 import torch
 import torchvision.transforms as transforms
@@ -46,7 +47,14 @@ class ObjectDetectionDataset(object):
         # load images
         img_name = self.image_files_list[idx]
         img_path = os.path.join(self.data_folder, img_name)
-        img = Image.open(img_path).convert("RGB")
+        if img_path.endswith('.dcm'):
+            img_dcm = pydicom.read_file(img_path)
+            img_npy = np.expand_dims(img_dcm.pixel_array, axis=2)
+            img_npy = np.concatenate([img_npy, img_npy, img_npy], axis=2)
+            img = Image.fromarray(img_npy)
+
+        else:
+            img = Image.open(img_path).convert("RGB")
         width, height = img.size[0], img.size[1]
 
         if self.data_type == 'train':
