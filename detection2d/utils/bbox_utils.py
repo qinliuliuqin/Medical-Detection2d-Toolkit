@@ -2,6 +2,32 @@ import cv2
 import numpy as np
 
 
+def read_boxes_center_from_localization_txt(localization_txt):
+    """ Read boxes information from the detected localization txt.
+
+    :param: localization_txt:
+    :return:
+        A boxes list and a labels list
+    """
+
+    pred_boxes_centers, pred_boxes_probs = [], []
+
+    if type(localization_txt) == str:
+        localization_txt = localization_txt.split(';')
+        for single_annot_txt in localization_txt:
+            single_annot_centers = single_annot_txt.split(' ')[1:]
+            single_annot_probs = single_annot_txt.split(' ')[0]
+            assert len(single_annot_centers) == 2
+
+            x = float(single_annot_centers[0])
+            y = float(single_annot_centers[1])
+            prob = float(single_annot_probs)
+            pred_boxes_centers.append([x, y])
+            pred_boxes_probs.append(prob)
+
+    return pred_boxes_centers, pred_boxes_probs
+
+
 def read_boxes_from_annotation_txt(annotation_txt):
     """ Read boxes information from the annotation txt.
 
@@ -15,6 +41,9 @@ def read_boxes_from_annotation_txt(annotation_txt):
         annotation_txt = annotation_txt.split(';')
         for single_annot_txt in annotation_txt:
             x, y = [], []
+            if len(single_annot_txt) == 0:
+                continue
+
             single_annot_coords = single_annot_txt[2:].split(' ')
             for i in range(len(single_annot_coords)):
                 if i % 2 == 0:
