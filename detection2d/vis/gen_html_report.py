@@ -1,6 +1,7 @@
-import copy
 import os
 import pandas as pd
+
+from detection2d.vis.error_analysis import error_analysis
 
 
 def add_document_text(original_text, new_text_to_add):
@@ -8,37 +9,6 @@ def add_document_text(original_text, new_text_to_add):
     Add document text file
     """
     return original_text + r'+"{0}"'.format(new_text_to_add)
-
-
-def write_summary_csv_report_for_all_landmarks(error_summary, csv_file_path):
-    """
-    Write a html report for all landmarks to summary the detection results
-    """
-    summary = []
-    for landmark_idx, landmark_name in enumerate(error_summary.all_cases.keys()):
-        num_pos_cases = len(error_summary.tp_cases[landmark_name]) + \
-                        len(error_summary.fn_cases[landmark_name])
-        num_neg_cases = len(error_summary.tn_cases[landmark_name]) + \
-                        len(error_summary.fp_cases[landmark_name])
-        if len(error_summary.tp_cases[landmark_name]) == 0 and num_pos_cases == 0:
-            tpr = 100
-        else:
-            tpr = len(error_summary.tp_cases[landmark_name]) / max(1, num_pos_cases) * 100
-        if len(error_summary.tn_cases[landmark_name]) == 0 and num_neg_cases == 0:
-            tnr = 100
-        else:
-            tnr = len(error_summary.tn_cases[landmark_name]) / max(1, num_neg_cases) * 100
-        mean_error = error_summary.mean_error_tp[landmark_name]
-        std_error = error_summary.std_error_tp[landmark_name]
-        median_error = error_summary.median_error_tp[landmark_name]
-        max_error = error_summary.max_error_tp[landmark_name]
-        summary.append([landmark_idx, landmark_name, num_pos_cases, num_neg_cases,
-                        tpr, tnr, mean_error, std_error, median_error, max_error])
-
-    columns = ['landmark_idx', 'landmark_name', 'pos_cases', 'neg_cases', 'TPR (%)', 'TNR (%)',
-               'mean error (mm)', 'stddev', 'median error (mm)', 'max error (mm)']
-    df = pd.DataFrame(data=summary, columns=columns)
-    df.to_csv(csv_file_path, index=False, float_format='%.2f')
 
 
 def write_html_report(document_text, analysis_text, html_report_path, width):
@@ -87,18 +57,6 @@ def write_html_report(document_text, analysis_text, html_report_path, width):
     f.close()
 
 
-# def add_three_images(document_text, image_link_template, image_folder, images, width):
-#     """
-#     Add three plane images to the document text file
-#     """
-#     for idx in range(3):
-#         document_text += "\n"
-#         image_info = r'<td>{0}</td>'.format(image_link_template.format(
-#             os.path.join(image_folder, images[idx]), width))
-#         document_text = add_document_text(document_text, image_info)
-#     return document_text
-
-
 def add_image(document_text, image_link_template, image_folder, image_name, width):
     """
     Add a image to the document text file
@@ -129,9 +87,10 @@ def gen_row_for_html(usage_flag, image_link_template, error_info_template, docum
         error_info = error_info_template.format(0)
 
     elif usage_flag == 2:
-        labeled_image_name = '{}_labelled.{}'.format(image_name_postfix, image_name_postfix)
+        labeled_image_name = '{}_labelled.{}'.format(image_name_prefix, image_name_postfix)
         detected_image_name = '{}_detected.{}'.format(image_name_prefix, image_name_postfix)
-        error_info = error_info_template.format(0, 0, 'TP', 0.0)
+        error_info = error_info_template.format(
+            error_summary.label[image_idx], error_summary.pred[image_idx], error_summary.error[image_idx])
 
     else:
         raise ValueError('Unsupported usage flag.')
@@ -157,9 +116,10 @@ def gen_row_for_html(usage_flag, image_link_template, error_info_template, docum
     return document_text
 
 
-def gen_html_report(image_list, objects_dict, usage_flag, output_folder):
+def gen_html_report(image_list, objects_dict, usage_flag, output_folder, decending=True):
     """
     Generate HTML report for object detection.
+    :param image_list: the list containing all images
     :param objects_dict:
     :param usage_flag: 1 for label checking, 2 for error evaluation
     :param output_folder:
@@ -167,8 +127,11 @@ def gen_html_report(image_list, objects_dict, usage_flag, output_folder):
     """
 
     labelled_objects_dict = objects_dict[0]
+
     if usage_flag == 2:
         detected_objects_dict = objects_dict[1]
+        error_summary = error_analysis(image_list, labelled_objects_dict, detected_objects_dict, decending)
+        image_list = error_summary.image_list
 
     document_text = r'"<h1>check annotations:</h1>"'
     for image_idx, image_name in enumerate(image_list):
@@ -183,14 +146,15 @@ def gen_html_report(image_list, objects_dict, usage_flag, output_folder):
 
         elif usage_flag == 2:
             error_info_template += r'<b>Detected</b>: {};'
-            error_info_template += r'<b>Type</b>: {};'
-            error_info_template += r'<b>Max Det. Prob.</b>: {};'
+            error_info_template += r'<b>Error</b>: {};'
 
             document_text = gen_row_for_html(usage_flag, image_link_template,
-                error_info_template, document_text, image_name, image_idx, None)
+                error_info_template, document_text, image_name, image_idx, error_summary)
         else:
             raise ValueError('Undefined usage flag!')
 
     html_report_name = 'result_analysis.html'
     html_report_path = os.path.join(output_folder, html_report_name)
     write_html_report(document_text, '', html_report_path, width=200)
+
+    return error_summary

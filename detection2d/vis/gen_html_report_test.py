@@ -14,7 +14,7 @@ def parse_and_check_arguments():
     default_label_file = '/mnt/projects/CXR_Object/dataset/dev.csv'
     default_detection_file = '/mnt/projects/CXR_Object/results/model_0622_2020/contrast_flip/dev/localization.csv'
     default_output_folder = '/mnt/projects/CXR_Object/results/model_0622_2020/html_report'
-    default_generate_pictures = False
+    default_generate_pictures = True
 
     parser = argparse.ArgumentParser(
         description='Snapshot three planes centered around landmarks.')
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     image_list = labels_df['image_name'].to_list()
 
     usage_flag = 1
-    preds_dict = {}
+    preds_dict = None
     if os.path.isfile(args.detection_file):
         usage_flag = 2
         preds_df = pd.read_csv(args.detection_file, na_filter=False)
@@ -58,8 +58,8 @@ if __name__ == '__main__':
     if not os.path.isdir(args.output_folder):
         os.makedirs(args.output_folder)
 
-    gen_html_report(image_list, [labels_dict, preds_dict], usage_flag, args.output_folder)
+    error_summary = gen_html_report(image_list, [labels_dict, preds_dict], usage_flag, args.output_folder)
 
     if args.generate_pictures:
         print('Start generating planes for the labelled landmarks.')
-        gen_plane_images(args.image_folder, labels_dict, preds_dict, args.output_folder)
+        gen_plane_images(error_summary, args.image_folder, labels_dict, preds_dict, 0, args.output_folder)
