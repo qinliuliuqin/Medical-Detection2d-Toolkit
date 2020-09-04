@@ -52,7 +52,7 @@ def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_fo
     image_names_df = pd.read_csv(infer_file, na_filter=False)
     image_names_dict = dict(zip(image_names_df.image_name, [0] * len(image_names_df.image_name)))
 
-    preds, labels, locs = [], [], []
+    preds, labels, centers, locs = [], [], [], []
 
     # load test dataset
     dataset = ObjectDetectionDataset(
@@ -85,6 +85,7 @@ def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_fo
                 preds.append(0)
                 center_points.append([])
                 center_points_preds.append('')
+                centers.append('')
                 locs.append('')
             else:
                 max_pred = torch.max(outputs[-1]['scores']).tolist()
@@ -107,15 +108,19 @@ def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_fo
                         center_points.append([center_x, center_y])
                 center_points_preds += new_scores.tolist()
 
-                line = ''
+                line_center, line_loc = '', ''
                 for i in range(len(new_boxes)):
                     if i == len(new_boxes) - 1:
-                        line += str(center_points_preds[i]) + ' ' + str(center_points[i][0]) + ' ' + str(
-                            center_points[i][1])
+                        line_center += str(center_points_preds[i]) + ' ' + str(center_points[i][0]) + ' ' + str(center_points[i][1])
+                        line_loc += '0' + ' ' + str(min(new_box[0], new_box[2])) + ' ' + str(min(new_box[1], new_box[3])) + \
+                                    ' ' + str(max(new_box[0], new_box[2])) + ' ' + str(max(new_box[1], new_box[3]))
                     else:
-                        line += str(center_points_preds[i]) + ' ' + str(center_points[i][0]) + ' ' + str(
+                        line_center += str(center_points_preds[i]) + ' ' + str(center_points[i][0]) + ' ' + str(
                             center_points[i][1]) + ';'
-                locs.append(line)
+                        line_loc += '0' + ' ' + str(min(new_box[0], new_box[2])) + ' ' + str(min(new_box[1], new_box[3])) + \
+                                    ' ' + str(max(new_box[0], new_box[2])) + ' ' + str(max(new_box[1], new_box[3])) + ';'
+                centers.append(line_center)
+                locs.append(line_loc)
 
     if not os.path.isdir(save_folder):
         os.makedirs(save_folder)
@@ -126,9 +131,9 @@ def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_fo
     )
     print('classification.csv generated.')
 
-    loc_res = pd.DataFrame({'image_name': dataset.image_files_list, 'prediction': locs})
+    loc_res = pd.DataFrame({'image_name': dataset.image_files_list, 'prediction': centers, 'annotation': locs})
     loc_res.to_csv(
-        os.path.join(save_folder, 'localization.csv'), columns=['image_name', 'prediction'], sep=',', index=None
+        os.path.join(save_folder, 'localization.csv'), columns=['image_name', 'prediction', 'annotation'], sep=',', index=None
     )
     print('localization.csv generated.')
 
