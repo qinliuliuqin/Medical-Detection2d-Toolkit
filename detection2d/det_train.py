@@ -171,7 +171,7 @@ def main():
                         default='/home/qinliu19/projects/Medical-Detection2d-Toolkit/detection2d/config/train_config.py',
                         help='configure file for medical image segmentation training.')
     parser.add_argument('-g', '--gpus',
-                        default=2,
+                        default=7,
                         help='the device id of gpus.')
     args = parser.parse_args()
 

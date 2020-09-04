@@ -138,13 +138,13 @@ def main():
     parser = argparse.ArgumentParser(description=long_description)
 
     parser.add_argument('-m', '--model-folder',
-                        default='/shenlab/lab_stor6/qinliu/projects/CXR_Object/models/model_0620_2020/contrast_fixed_normalizer',
+                        default='/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/models/model_0903_2020/baseline',
                         help='Model folder containing the model and inference config file.')
     parser.add_argument('-d', '--data-folder',
-                        default='/shenlab/lab_stor6/projects/CXR_Object/data/dev',
+                        default='/shenlab/lab_stor6/qinliu/CXR_Pneumonia/Stage2/stage_2_train_images',
                         help='The data folder.')
     parser.add_argument('-i', '--infer-file',
-                        default='/shenlab/lab_stor6/projects/CXR_Object/dataset/dev.csv',
+                        default='/shenlab/lab_stor6/qinliu/CXR_Pneumonia/Stage2/dataset/dev_label.csv',
                         help='')
     parser.add_argument('-n', '--num-classes',
                         default=2,
@@ -153,7 +153,7 @@ def main():
                         default=0.5,
                         help='')
     parser.add_argument('-o', '--output',
-                        default='/shenlab/lab_stor6/qinliu/projects/CXR_Object/results/model_0620_2020/contrast_fixed_normalizer/dev',
+                        default='/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/results/model_0903_2020/baseline',
                         help='')
     parser.add_argument('-g', '--gpu',
                         default=6,

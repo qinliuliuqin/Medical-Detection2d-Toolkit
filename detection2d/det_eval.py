@@ -51,7 +51,7 @@ def evaluate_froc(gt_csv_path, pred_csv_path, fps):
         # header
         next(f)
         for line in f:
-            image_path, annotation = line.strip('\n').split(',')
+            _, image_path, annotation, _ = line.strip('\n').split(',')
 
             if annotation == '':
                 num_image += 1
@@ -184,12 +184,16 @@ def evaluate_roc_auc_acc(gt_csv_path, pred_csv_paths):
 def main():
 
     default_pred_csv_path = [
-        '/mnt/projects/CXR_Object/results/model_0622_2020/contrast_flip/val/localization.csv'
+        '/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/results/model_0903_2020/baseline/localization.csv',
+        #'/shenlab/lab_stor6/qinliu/projects/CXR_Object/results/model_0622_2020/contrast_flip_lr/val2/localization.csv',
+        #'/shenlab/lab_stor6/qinliu/projects/CXR_Object/results/model_0622_2020/contrast_flip_lr/val3/localization.csv',
+        #'/shenlab/lab_stor6/qinliu/projects/CXR_Object/results/model_0622_2020/contrast_flip_lr/val4/localization.csv',
+        #'/shenlab/lab_stor6/qinliu/projects/CXR_Object/results/model_0622_2020/contrast_flip_lr/val5/localization.csv'
     ]
 
     parser = argparse.ArgumentParser(description='Compute FROC')
     parser.add_argument('-g', '--gt-csv',
-                        default='/mnt/projects/CXR_Object/dataset/dev.csv',
+                        default='/shenlab/lab_stor6/qinliu/CXR_Pneumonia/Stage2/dataset/dev_label.csv',
                         metavar='GT_CSV',
                         help="Path to the ground truch csv file")
     parser.add_argument('-p', '--pred-csv',
