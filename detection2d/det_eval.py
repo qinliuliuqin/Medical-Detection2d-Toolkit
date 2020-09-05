@@ -1,5 +1,6 @@
 import argparse
 from collections import namedtuple
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from skimage.measure import points_in_poly
@@ -132,7 +133,7 @@ def evaluate_froc(gt_csv_path, pred_csv_path, fps):
     print(np.mean(froc))
 
 
-def evaluate_roc_auc_acc(gt_csv_path, pred_csv_paths):
+def evaluate_roc_auc_acc(gt_csv_path, pred_csv_paths, plot_curve=False):
     """
     :param gt_csv_path:
     :param pred_csv_path:
@@ -179,14 +180,27 @@ def evaluate_roc_auc_acc(gt_csv_path, pred_csv_paths):
     roc_auc = auc(fpr, tpr)
     print('ACC: {}'.format(acc), 'AUC: {}'.format(roc_auc))
 
+    # plot the roc curve
+    if plot_curve:
+        fig, ax = plt.subplots(
+            subplot_kw=dict(xlim=[0, 1], ylim=[0, 1], aspect='equal'),
+            figsize=(6, 6)
+        )
+        ax.plot(fpr, tpr, label=f'ACC: {acc:.03}\nAUC: {roc_auc:.03}')
+        _ = ax.legend(loc="lower right")
+        _ = ax.set_title('ROC curve')
+        ax.grid(linestyle='dashed')
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.show()
 
 
 def main():
 
     default_pred_csv_path = [
-        '/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/results/model_0904_2020/normal/test/localization.csv',
-        '/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/results/model_0904_2020/contrast/test/localization.csv',
-        '/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/results/model_0904_2020/contrast2/test/localization.csv'
+        '/mnt/projects/CXR_Pneumonia/results/model_0904_2020/normal/test/localization.csv'
+        #'/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/results/model_0904_2020/contrast/test/localization.csv',
+        #'/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/results/model_0904_2020/contrast2/test/localization.csv'
         #'/shenlab/lab_stor6/qinliu/projects/CXR_Object/results/model_0622_2020/contrast_flip_lr/val2/localization.csv',
         #'/shenlab/lab_stor6/qinliu/projects/CXR_Object/results/model_0622_2020/contrast_flip_lr/val3/localization.csv',
         #'/shenlab/lab_stor6/qinliu/projects/CXR_Object/results/model_0622_2020/contrast_flip_lr/val4/localization.csv',
@@ -195,7 +209,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Compute FROC')
     parser.add_argument('-g', '--gt-csv',
-                        default='/shenlab/lab_stor6/qinliu/CXR_Pneumonia/Stage2/dataset/test_label.csv',
+                        default='/mnt/projects/CXR_Pneumonia/Stage2/dataset/test_label.csv',
                         metavar='GT_CSV',
                         help="Path to the ground truch csv file")
     parser.add_argument('-p', '--pred-csv',
@@ -205,11 +219,14 @@ def main():
     parser.add_argument('-f', '--fps',
                         default='0.125,0.25,0.5,1,2,4,8',
                         help='False positives per image to compute FROC, comma separated')
+    parser.add_argument('-c', '--curve',
+                        default=True,
+                        help='Plot the roc curve.')
 
     args = parser.parse_args()
 
     evaluate_froc(args.gt_csv, args.pred_csv[0], args.fps)
-    evaluate_roc_auc_acc(args.gt_csv, args.pred_csv)
+    evaluate_roc_auc_acc(args.gt_csv, args.pred_csv, args.curve)
 
 
 if __name__ == '__main__':
