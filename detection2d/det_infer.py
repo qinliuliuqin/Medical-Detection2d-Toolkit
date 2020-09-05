@@ -101,28 +101,34 @@ def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_fo
                 boxes_preds = []
                 for i in range(len(new_boxes)):
                     new_box = new_boxes[i].tolist()
-                    boxes_preds.append(new_box)
+                    x_min, y_min = min(new_box[0], new_box[2]), min(new_box[1], new_box[3])
+                    x_max, y_max = max(new_box[0], new_box[2]), max(new_box[1], new_box[3])
+                    boxes_preds.append([x_min, y_min, x_max, y_max])
 
-                    center_x = (new_box[0] + new_box[2]) / 2
-                    center_y = (new_box[1] + new_box[3]) / 2
                     if resize_size is not None:
-                        center_points.append([center_x / resize_size[0] * width[-1], center_y / resize_size[1] * height[-1]])
-                    else:
-                        center_points.append([center_x, center_y])
+                        x_min = x_min / resize_size[0] * width[-1]
+                        x_max = x_max / resize_size[0] * width[-1]
+                        y_min = y_min / resize_size[1] * height[-1]
+                        y_max = y_max / resize_size[1] * height[-1]
+
+                    center_x = (x_min + x_max) / 2
+                    center_y = (y_min + y_max) / 2
+                    center_points.append([center_x, center_y])
                 center_points_preds += new_scores.tolist()
 
                 line_center, line_loc = '', ''
                 for i in range(len(new_boxes)):
-                    box = boxes_preds[i]
+                    x_min, y_min, x_max, y_max = boxes_preds[i]
                     if i == len(new_boxes) - 1:
                         line_center += str(center_points_preds[i]) + ' ' + str(center_points[i][0]) + ' ' + str(center_points[i][1])
-                        line_loc += str(center_points_preds[i]) + ' ' + str(min(box[0], box[2])) + ' ' + str(min(box[1], box[3])) + \
-                                    ' ' + str(max(box[0], box[2])) + ' ' + str(max(box[1], box[3]))
+                        line_loc += str(center_points_preds[i]) + ' ' + str(int(x_min + 0.5)) + ' ' + str(int(y_min + 0.5)) + \
+                                    ' ' + str(int(x_max + 0.5)) + ' ' + str(int(y_max + 0.5))
                     else:
                         line_center += str(center_points_preds[i]) + ' ' + str(center_points[i][0]) + ' ' + str(
                             center_points[i][1]) + ';'
-                        line_loc += str(center_points_preds[i]) + ' ' + str(min(box[0], box[2])) + ' ' + str(min(box[1], box[3])) + \
-                                    ' ' + str(max(box[0], box[2])) + ' ' + str(max(box[1], box[3])) + ';'
+                        line_loc += str(center_points_preds[i]) + ' ' + str(int(x_min + 0.5)) + ' ' + str(int(y_min + 0.5)) + \
+                                    ' ' + str(int(x_max + 0.5)) + ' ' + str(int(y_max + 0.5)) + ';'
+
                 centers.append(line_center)
                 locs.append(line_loc)
 
