@@ -89,12 +89,16 @@ def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_fo
                 locs.append('')
             else:
                 max_pred = torch.max(outputs[-1]['scores']).tolist()
-                if max_pred >= threshold:
-                    preds.append(max_pred)
-                else:
+                if max_pred < threshold:
                     preds.append(0)
+                    center_points.append([])
+                    center_points_preds.append('')
+                    centers.append('')
+                    locs.append('')
+                    continue
 
-                new_output_index = torch.where((outputs[-1]['scores'] > 0.1))
+                preds.append(max_pred)
+                new_output_index = torch.where((outputs[-1]['scores'] > float(threshold)))
                 new_boxes = outputs[-1]['boxes'][new_output_index]
                 new_scores = outputs[-1]['scores'][new_output_index]
 
