@@ -10,10 +10,10 @@ def parse_and_check_arguments():
     """
     Parse input arguments and raise error if invalid.
     """
-    default_image_folder = '/mnt/projects/CXR_Object/data/dev'
-    default_label_file = '/mnt/projects/CXR_Object/dataset/dev.csv'
-    default_detection_file = '/mnt/projects/CXR_Object/results/model_0622_2020/contrast_flip/dev/localization.csv'
-    default_output_folder = '/mnt/projects/CXR_Object/results/model_0622_2020/html_report'
+    default_image_folder = '/mnt/projects/CXR_Pneumonia/Stage2/stage_2_train_images'
+    default_label_file = '/mnt/projects/CXR_Pneumonia/Stage2/dataset/test_label.csv'
+    default_detection_file = '/mnt/projects/CXR_Pneumonia/results/model_0904_2020/normal/test/localization.csv'
+    default_output_folder = '/mnt/projects/CXR_Pneumonia/results/model_0904_2020/normal/test/html_report'
     default_generate_pictures = True
 
     parser = argparse.ArgumentParser(
@@ -52,8 +52,8 @@ if __name__ == '__main__':
     if os.path.isfile(args.detection_file):
         usage_flag = 2
         preds_df = pd.read_csv(args.detection_file, na_filter=False)
-        preds = preds_df.loc[preds_df['prediction'].astype(bool)].reset_index(drop=True)
-        preds_dict = dict(zip(preds.image_name, preds.prediction))
+        preds = preds_df.loc[preds_df['annotation'].astype(bool)].reset_index(drop=True)
+        preds_dict = dict(zip(preds.image_name, preds.annotation))
 
     if not os.path.isdir(args.output_folder):
         os.makedirs(args.output_folder)

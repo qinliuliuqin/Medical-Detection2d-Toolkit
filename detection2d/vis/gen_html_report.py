@@ -81,6 +81,8 @@ def gen_row_for_html(usage_flag, image_link_template, error_info_template, docum
     case_info = r'<b>Case nunmber</b>:{0}: {1};'.format(image_idx, image_name)
     image_name_prefix = image_name.split('.')[0]
     image_name_postfix = image_name.split('.')[1]
+    if image_name_postfix == 'dcm':
+        image_name_postfix = 'jpg'
 
     if usage_flag == 1:
         labeled_image_name = '{}_labelled.{}'.format(image_name_postfix, image_name_postfix)

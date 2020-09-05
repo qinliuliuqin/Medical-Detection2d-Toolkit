@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import pydicom
 import PIL.Image as Image
 
 from detection2d.utils.bbox_utils import read_boxes_from_annotation_txt, draw_rect
@@ -52,9 +53,18 @@ def gen_plane_images(error_summary, image_folder, labels_dict, preds_dict, error
     image_list = error_summary.image_list
     for image_idx, image_name in enumerate(image_list):
         print(image_name)
+        if image_name.endswith('.dcm'):
+            img_dcm = pydicom.read_file(os.path.join(image_folder, image_name))
+            img_npy = np.expand_dims(img_dcm.pixel_array, axis=2)
+            img_npy = np.concatenate([img_npy, img_npy, img_npy], axis=2)
+            image = Image.fromarray(img_npy)
 
-        image = Image.open(os.path.join(image_folder, image_name)).convert('RGB')
+        else:
+            image = Image.open(os.path.join(image_folder, image_name)).convert('RGB')
+
         image_pre, image_post = image_name.split('.')
+        if image_post == 'dcm':
+            image_post = 'jpg'
 
         label_image_name = '{}_labelled.{}'.format(image_pre, image_post)
         pred_image_name = '{}_detected.{}'.format(image_pre, image_post)
@@ -71,6 +81,21 @@ def gen_plane_images(error_summary, image_folder, labels_dict, preds_dict, error
             # Save and close the figure.
             fig.savefig(os.path.join(output_picture_folder, label_image_name))
             fig.clf()
+
+        if image_name in preds_dict.keys():
+            annotation = preds_dict[image_name]
+            bboxes, _ = read_boxes_from_annotation_txt(annotation)
+            pred_image = draw_rect(np.array(image), np.array(bboxes), color=[25, 255, 255])
+
+            # Create a new figure
+            fig = plt.figure(1, figsize=(5, 5))
+            plt.imshow(pred_image)
+
+            # Save and close the figure.
+            fig.savefig(os.path.join(output_picture_folder, pred_image_name))
+            fig.clf()
+
+
 
         if image_name in preds_dict.keys():
             pass
