@@ -121,13 +121,10 @@ def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_fo
                     x_min, y_min, x_max, y_max = boxes_preds[i]
                     if i == len(new_boxes) - 1:
                         line_center += str(center_points_preds[i]) + ' ' + str(center_points[i][0]) + ' ' + str(center_points[i][1])
-                        line_loc += str(center_points_preds[i]) + ' ' + str(int(x_min + 0.5)) + ' ' + str(int(y_min + 0.5)) + \
-                                    ' ' + str(int(x_max + 0.5)) + ' ' + str(int(y_max + 0.5))
+                        line_loc += str(center_points_preds[i]) + ' ' + str(x_min) + ' ' + str(y_min) + ' ' + str(x_max) + ' ' + str(y_max)
                     else:
-                        line_center += str(center_points_preds[i]) + ' ' + str(center_points[i][0]) + ' ' + str(
-                            center_points[i][1]) + ';'
-                        line_loc += str(center_points_preds[i]) + ' ' + str(int(x_min + 0.5)) + ' ' + str(int(y_min + 0.5)) + \
-                                    ' ' + str(int(x_max + 0.5)) + ' ' + str(int(y_max + 0.5)) + ';'
+                        line_center += str(center_points_preds[i]) + ' ' + str(center_points[i][0]) + ' ' + str(center_points[i][1]) + ';'
+                        line_loc += str(center_points_preds[i]) + ' ' + str(x_min) + ' ' + str(y_min) + ' ' + str(x_max) + ' ' + str(y_max) + ';'
 
                 centers.append(line_center)
                 locs.append(line_loc)
