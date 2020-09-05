@@ -44,7 +44,7 @@ def read_boxes_from_annotation_txt(annotation_txt):
             if len(single_annot_txt) == 0:
                 continue
 
-            single_annot_coords = single_annot_txt[2:].split(' ')
+            single_annot_coords = single_annot_txt.split()[1:]
             for i in range(len(single_annot_coords)):
                 if i % 2 == 0:
                     x.append(float(single_annot_coords[i]))
