@@ -98,8 +98,11 @@ def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_fo
                 new_boxes = outputs[-1]['boxes'][new_output_index]
                 new_scores = outputs[-1]['scores'][new_output_index]
 
+                boxes_preds = []
                 for i in range(len(new_boxes)):
                     new_box = new_boxes[i].tolist()
+                    boxes_preds.append(new_box)
+
                     center_x = (new_box[0] + new_box[2]) / 2
                     center_y = (new_box[1] + new_box[3]) / 2
                     if resize_size is not None:
@@ -110,15 +113,16 @@ def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_fo
 
                 line_center, line_loc = '', ''
                 for i in range(len(new_boxes)):
+                    box = boxes_preds[i]
                     if i == len(new_boxes) - 1:
                         line_center += str(center_points_preds[i]) + ' ' + str(center_points[i][0]) + ' ' + str(center_points[i][1])
-                        line_loc += '0' + ' ' + str(min(new_box[0], new_box[2])) + ' ' + str(min(new_box[1], new_box[3])) + \
-                                    ' ' + str(max(new_box[0], new_box[2])) + ' ' + str(max(new_box[1], new_box[3]))
+                        line_loc += '0' + ' ' + str(min(box[0], box[2])) + ' ' + str(min(box[1], box[3])) + \
+                                    ' ' + str(max(box[0], box[2])) + ' ' + str(max(box[1], box[3]))
                     else:
                         line_center += str(center_points_preds[i]) + ' ' + str(center_points[i][0]) + ' ' + str(
                             center_points[i][1]) + ';'
-                        line_loc += '0' + ' ' + str(min(new_box[0], new_box[2])) + ' ' + str(min(new_box[1], new_box[3])) + \
-                                    ' ' + str(max(new_box[0], new_box[2])) + ' ' + str(max(new_box[1], new_box[3])) + ';'
+                        line_loc += '0' + ' ' + str(min(box[0], box[2])) + ' ' + str(min(box[1], box[3])) + \
+                                    ' ' + str(max(box[0], box[2])) + ' ' + str(max(box[1], box[3])) + ';'
                 centers.append(line_center)
                 locs.append(line_loc)
 
