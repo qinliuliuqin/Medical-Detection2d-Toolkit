@@ -67,15 +67,11 @@ def gen_plane_images(error_summary, image_folder, labels_dict, preds_dict, error
             image_post = 'jpg'
 
         label_image_name = '{}_labelled.{}'.format(image_pre, image_post)
-
         image_npy = np.array(image)
-
         if image_name in labels_dict.keys():
             annotation = labels_dict[image_name]
             bboxes, _ = read_boxes_from_annotation_txt(annotation)
             image_npy = draw_rect(np.array(image_npy), np.array(bboxes), color=[25, 255, 25])
-
-
 
         if preds_dict is not None and image_name in preds_dict:
             if image_name in preds_dict.keys():
@@ -83,11 +79,10 @@ def gen_plane_images(error_summary, image_folder, labels_dict, preds_dict, error
                 bboxes, _ = read_boxes_from_annotation_txt(annotation)
                 image_npy = draw_rect(np.array(image_npy), np.array(bboxes), color=[255, 25, 25])
 
-        if image_name in labels_dict.keys() and preds_dict is not None and image_name in preds_dict:
-            # Create a new figure
-            fig = plt.figure(1, figsize=(5, 5))
-            plt.imshow(image_npy)
+        # Create a new figure
+        fig = plt.figure(1, figsize=(5, 5))
+        plt.imshow(image_npy)
 
-            # Save and close the figure.
-            fig.savefig(os.path.join(output_picture_folder, label_image_name))
-            fig.clf()
+        # Save and close the figure.
+        fig.savefig(os.path.join(output_picture_folder, label_image_name))
+        fig.clf()
