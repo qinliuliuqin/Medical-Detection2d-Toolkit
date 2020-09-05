@@ -11,15 +11,15 @@ cfg = __C
 ##################################
 __C.general = {}
 
-__C.general.train_label_file = '/shenlab/lab_stor6/projects/CXR_Object/dataset/train_label.csv'
+__C.general.train_label_file = '/shenlab/lab_stor6/qinliu/CXR_Pneumonia/Stage2/dataset/train_label.csv'
 
-__C.general.train_image_folder = '/shenlab/lab_stor6/projects/CXR_Object/data/train'
+__C.general.train_image_folder = '/shenlab/lab_stor6/qinliu/CXR_Pneumonia/Stage2/stage_2_train_images'
 
-__C.general.val_label_file = '/shenlab/lab_stor6/projects/CXR_Object/dataset/dev_label.csv'
+__C.general.val_label_file = '/shenlab/lab_stor6/qinliu/CXR_Pneumonia/Stage2/dataset/dev_label.csv'
 
-__C.general.val_image_folder = '/shenlab/lab_stor6/projects/CXR_Object/data/dev'
+__C.general.val_image_folder = '/shenlab/lab_stor6/qinliu/CXR_Pneumonia/Stage2/stage_2_train_images'
 
-__C.general.save_dir = '/shenlab/lab_stor6/qinliu/projects/CXR_Object/models/model_0622_2020/contrast_flip'
+__C.general.save_dir = '/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/models/model_0903_2020/baseline'
 
 __C.general.resume_epoch = -1
 
@@ -67,7 +67,7 @@ __C.train.batch_size = 12
 
 __C.train.num_threads = 12
 
-__C.train.lr = 0.0001
+__C.train.lr = 0.00005
 
 __C.train.print_freq = 20
 
