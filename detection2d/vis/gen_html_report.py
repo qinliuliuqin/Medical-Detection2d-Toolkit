@@ -102,12 +102,8 @@ def gen_row_for_html(usage_flag, image_link_template, error_info_template, docum
     document_text += "\n"
     document_text = add_document_text(document_text, "<table border=1><tr>")
 
-    if usage_flag == 1:
+    if usage_flag == 1 or usage_flag == 2:
         document_text = add_image(document_text, image_link_template, picture_folder, labeled_image_name, width)
-
-    elif usage_flag == 2:
-        document_text = add_image(document_text, image_link_template, picture_folder, labeled_image_name, width)
-        document_text = add_image(document_text, image_link_template, picture_folder, detected_image_name, width)
 
     else:
         raise ValueError('Unsupported usage flag.')
