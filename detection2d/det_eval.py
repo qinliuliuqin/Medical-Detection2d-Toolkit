@@ -76,7 +76,7 @@ def evaluate_froc(gt_csv_path, pred_csv_path, fps):
         # header
         next(f)
         for line in f:
-            image_path, prediction = line.strip('\n').split(',')
+            image_path, prediction, _ = line.strip('\n').split(',')
 
             if prediction == '':
                 continue
@@ -184,7 +184,9 @@ def evaluate_roc_auc_acc(gt_csv_path, pred_csv_paths):
 def main():
 
     default_pred_csv_path = [
-        '/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/results/model_0903_2020/baseline/localization.csv',
+        '/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/results/model_0904_2020/normal/test/localization.csv',
+        '/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/results/model_0904_2020/contrast/test/localization.csv',
+        '/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/results/model_0904_2020/contrast2/test/localization.csv'
         #'/shenlab/lab_stor6/qinliu/projects/CXR_Object/results/model_0622_2020/contrast_flip_lr/val2/localization.csv',
         #'/shenlab/lab_stor6/qinliu/projects/CXR_Object/results/model_0622_2020/contrast_flip_lr/val3/localization.csv',
         #'/shenlab/lab_stor6/qinliu/projects/CXR_Object/results/model_0622_2020/contrast_flip_lr/val4/localization.csv',
@@ -193,7 +195,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Compute FROC')
     parser.add_argument('-g', '--gt-csv',
-                        default='/shenlab/lab_stor6/qinliu/CXR_Pneumonia/Stage2/dataset/dev_label.csv',
+                        default='/shenlab/lab_stor6/qinliu/CXR_Pneumonia/Stage2/dataset/test_label.csv',
                         metavar='GT_CSV',
                         help="Path to the ground truch csv file")
     parser.add_argument('-p', '--pred-csv',
