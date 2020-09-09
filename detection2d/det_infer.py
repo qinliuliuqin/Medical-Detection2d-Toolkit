@@ -107,13 +107,14 @@ def infer(model_folder, data_folder, infer_file, num_classes, threshold, save_fo
                     new_box = new_boxes[i].tolist()
                     x_min, y_min = min(new_box[0], new_box[2]), min(new_box[1], new_box[3])
                     x_max, y_max = max(new_box[0], new_box[2]), max(new_box[1], new_box[3])
-                    boxes_preds.append([x_min, y_min, x_max, y_max])
 
                     if resize_size is not None:
                         x_min = x_min / resize_size[0] * width[-1]
                         x_max = x_max / resize_size[0] * width[-1]
                         y_min = y_min / resize_size[1] * height[-1]
                         y_max = y_max / resize_size[1] * height[-1]
+
+                    boxes_preds.append([x_min, y_min, x_max, y_max])
 
                     center_x = (x_min + x_max) / 2
                     center_y = (y_min + y_max) / 2
@@ -154,25 +155,25 @@ def main():
     parser = argparse.ArgumentParser(description=long_description)
 
     parser.add_argument('-m', '--model-folder',
-                        default='/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/models/model_0903_2020/baseline',
+                        default='/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/models/model_0904_2020/normal',
                         help='Model folder containing the model and inference config file.')
     parser.add_argument('-d', '--data-folder',
                         default='/shenlab/lab_stor6/qinliu/CXR_Pneumonia/Stage2/stage_2_train_images',
                         help='The data folder.')
     parser.add_argument('-i', '--infer-file',
-                        default='/shenlab/lab_stor6/qinliu/CXR_Pneumonia/Stage2/dataset/dev_label.csv',
+                        default='/shenlab/lab_stor6/qinliu/CXR_Pneumonia/Stage2/dataset/test_label.csv',
                         help='')
     parser.add_argument('-n', '--num-classes',
                         default=2,
                         help='')
     parser.add_argument('-t', '--threshold',
-                        default=0.5,
+                        default=0.8,
                         help='')
     parser.add_argument('-o', '--output',
-                        default='/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/results/model_0903_2020/baseline',
+                        default='/shenlab/lab_stor6/qinliu/projects/CXR_Pneumonia/results/model_0904_2020/normal/test',
                         help='')
     parser.add_argument('-g', '--gpu',
-                        default=6,
+                        default=0,
                         help='')
     args = parser.parse_args()
 
